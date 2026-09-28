@@ -1,0 +1,254 @@
+:root {
+  color-scheme: light;
+  --ink: #332d39;
+  --muted: #786f7b;
+  --cream: #fff8ee;
+  --peach: #ffb58f;
+  --orange: #f47c48;
+  --purple: #8c5bb5;
+  --purple-dark: #62407f;
+  --yellow: #ffd36a;
+  font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background: linear-gradient(145deg, #ffe2c8 0%, #fff7e8 48%, #eadcf4 100%);
+}
+
+.page-shell {
+  width: min(100% - 32px, 980px);
+  margin: 0 auto;
+  padding: 48px 0 24px;
+}
+
+.intro {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.eyebrow,
+.label {
+  margin: 0 0 10px;
+  color: var(--purple-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  font-size: clamp(2.25rem, 7vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.subtitle {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.game-card {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 70px rgba(111, 72, 107, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.game-card__header,
+.game-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 30px;
+}
+
+.game-card__header {
+  border-bottom: 1px solid rgba(111, 72, 107, 0.1);
+}
+
+.game-card h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+.score {
+  min-width: 76px;
+  padding: 9px 13px;
+  border-radius: 15px;
+  color: #fff;
+  text-align: center;
+  background: var(--purple);
+}
+
+.score__label {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.score__value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.playfield {
+  position: relative;
+  min-height: 340px;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(#a9dff1 0%, #d9f2f3 68%, #f8d59c 68%);
+  outline: none;
+}
+
+.playfield:focus-visible {
+  box-shadow: inset 0 0 0 4px var(--purple);
+}
+
+.cloud {
+  position: absolute;
+  width: 120px;
+  height: 35px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.cloud::before,
+.cloud::after {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: inherit;
+  content: "";
+}
+
+.cloud::before {
+  left: 20px;
+  width: 48px;
+  height: 48px;
+}
+
+.cloud::after {
+  right: 19px;
+  width: 58px;
+  height: 58px;
+}
+
+.cloud--one {
+  top: 58px;
+  left: 11%;
+}
+
+.cloud--two {
+  top: 120px;
+  right: 10%;
+  transform: scale(0.7);
+  opacity: 0.7;
+}
+
+.character,
+.mandarins {
+  position: absolute;
+  z-index: 2;
+  filter: drop-shadow(0 9px 7px rgba(95, 65, 45, 0.16));
+}
+
+.character {
+  bottom: 36px;
+  left: 20%;
+  font-size: clamp(4.7rem, 13vw, 7rem);
+}
+
+.mandarins {
+  right: 19%;
+  bottom: 34px;
+  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  letter-spacing: -0.28em;
+}
+
+.ground {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 38px;
+  border-top: 4px solid #eab678;
+  background: repeating-linear-gradient(-45deg, #f6c987 0 14px, #f2c17e 14px 28px);
+}
+
+.game-card__footer {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.game-card__footer p {
+  margin-bottom: 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  color: var(--purple-dark);
+  font-weight: 700;
+}
+
+.status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--yellow);
+}
+
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 4px 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .page-shell {
+    padding-top: 32px;
+  }
+
+  .game-card__header,
+  .game-card__footer {
+    padding: 20px;
+  }
+
+  .game-card__footer,
+  .page-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .playfield {
+    min-height: 290px;
+  }
+}
