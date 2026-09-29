@@ -169,7 +169,7 @@ h1 {
 }
 
 .character,
-.mandarins {
+.obstacles {
   position: absolute;
   z-index: 2;
   filter: drop-shadow(0 9px 7px rgba(95, 65, 45, 0.16));
@@ -178,14 +178,27 @@ h1 {
 .character {
   bottom: 36px;
   left: 20%;
+}
+
+.character__sprite {
+  display: block;
   font-size: clamp(4.7rem, 13vw, 7rem);
 }
 
-.mandarins {
+.obstacles {
+  display: flex;
+  align-items: flex-end;
   right: 19%;
   bottom: 34px;
+}
+
+.obstacle {
+  display: block;
   font-size: clamp(2.4rem, 7vw, 3.8rem);
-  letter-spacing: -0.28em;
+}
+
+.obstacle + .obstacle {
+  margin-left: -0.18em;
 }
 
 .ground {

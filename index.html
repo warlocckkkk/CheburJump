@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 1 из 70</p>
+        <p class="eyebrow">День 2 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
-          Чебурашка готовится к большому прыжку. Сегодня знакомимся с его
-          тренировочной площадкой.
+          Чебурашка готовится к большому прыжку. Персонаж и мандарины заняли
+          свои места на тренировочной площадке.
         </p>
       </header>
 
@@ -37,8 +37,13 @@
         <div class="playfield" id="playfield" role="button" tabindex="0" aria-label="Тренировочное поле">
           <div class="cloud cloud--one" aria-hidden="true"></div>
           <div class="cloud cloud--two" aria-hidden="true"></div>
-          <div class="character" aria-label="Чебурашка" role="img">🧸</div>
-          <div class="mandarins" aria-label="Мандарины" role="img">🍊 🍊</div>
+          <div class="character" id="character" aria-label="Чебурашка" role="img">
+            <span class="character__sprite" aria-hidden="true">🧸</span>
+          </div>
+          <div class="obstacles" id="obstacles" aria-label="Мандарины" role="img">
+            <span class="obstacle" aria-hidden="true">🍊</span>
+            <span class="obstacle" aria-hidden="true">🍊</span>
+          </div>
           <div class="ground" aria-hidden="true"></div>
         </div>
 
@@ -50,7 +55,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.1</span>
+        <span>Версия 0.2</span>
       </footer>
     </main>
   </body>
