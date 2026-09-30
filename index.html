@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 2 из 70</p>
+        <p class="eyebrow">День 3 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
-          Чебурашка готовится к большому прыжку. Персонаж и мандарины заняли
-          свои места на тренировочной площадке.
+          У Чебурашки появились большие уши и своя мордочка. Он всё ещё
+          тренируется замечать мандарины.
         </p>
       </header>
 
@@ -38,7 +38,17 @@
           <div class="cloud cloud--one" aria-hidden="true"></div>
           <div class="cloud cloud--two" aria-hidden="true"></div>
           <div class="character" id="character" aria-label="Чебурашка" role="img">
-            <span class="character__sprite" aria-hidden="true">🧸</span>
+            <div class="character__body" aria-hidden="true"></div>
+            <div class="character__head" aria-hidden="true">
+              <span class="character__ear character__ear--left"></span>
+              <span class="character__ear character__ear--right"></span>
+              <span class="character__face">
+                <span class="character__eye character__eye--left"></span>
+                <span class="character__eye character__eye--right"></span>
+                <span class="character__nose"></span>
+                <span class="character__smile"></span>
+              </span>
+            </div>
           </div>
           <div class="obstacles" id="obstacles" aria-label="Мандарины" role="img">
             <span class="obstacle" aria-hidden="true">🍊</span>
@@ -55,7 +65,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.2</span>
+        <span>Версия 0.3</span>
       </footer>
     </main>
   </body>

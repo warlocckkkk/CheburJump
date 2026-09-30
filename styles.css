@@ -176,13 +176,114 @@ h1 {
 }
 
 .character {
+  width: 132px;
+  height: 138px;
   bottom: 36px;
   left: 20%;
 }
 
-.character__sprite {
-  display: block;
-  font-size: clamp(4.7rem, 13vw, 7rem);
+.character__body {
+  position: absolute;
+  bottom: 0;
+  left: 39px;
+  width: 54px;
+  height: 63px;
+  border: 3px solid #623922;
+  border-radius: 45% 45% 38% 38%;
+  background: #8b5230;
+}
+
+.character__body::after {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  width: 28px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ddb28c;
+  content: "";
+}
+
+.character__head {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 26px;
+  width: 80px;
+  height: 85px;
+  border: 3px solid #623922;
+  border-radius: 46%;
+  background: #8b5230;
+}
+
+.character__ear {
+  position: absolute;
+  z-index: -1;
+  top: 17px;
+  width: 52px;
+  height: 64px;
+  border: 3px solid #623922;
+  border-radius: 50%;
+  background: #8b5230;
+}
+
+.character__ear::after {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #bc7d58;
+  content: "";
+}
+
+.character__ear--left {
+  left: -42px;
+  transform: rotate(-15deg);
+}
+
+.character__ear--right {
+  right: -42px;
+  transform: rotate(15deg);
+}
+
+.character__face {
+  position: absolute;
+  inset: 15px 8px 6px;
+  border-radius: 48% 48% 43% 43%;
+  background: #ddb28c;
+}
+
+.character__eye {
+  position: absolute;
+  top: 16px;
+  width: 9px;
+  height: 12px;
+  border-radius: 50%;
+  background: #32251d;
+}
+
+.character__eye--left { left: 13px; }
+.character__eye--right { right: 13px; }
+
+.character__nose {
+  position: absolute;
+  top: 31px;
+  left: 50%;
+  width: 10px;
+  height: 7px;
+  border-radius: 50%;
+  background: #543426;
+  transform: translateX(-50%);
+}
+
+.character__smile {
+  position: absolute;
+  top: 37px;
+  left: 50%;
+  width: 22px;
+  height: 9px;
+  border-bottom: 2px solid #543426;
+  border-radius: 0 0 50% 50%;
+  transform: translateX(-50%);
 }
 
 .obstacles {
@@ -263,5 +364,10 @@ h1 {
 
   .playfield {
     min-height: 290px;
+  }
+
+  .character {
+    transform: scale(0.8);
+    transform-origin: bottom left;
   }
 }
