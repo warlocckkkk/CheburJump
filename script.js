@@ -9,7 +9,7 @@ function registerTrainingClick() {
   scoreElement.textContent = trainingClicks;
   messageElement.textContent =
     trainingClicks === 1
-      ? "Отлично! Чебурашка заметил мандарины."
+      ? "Отлично! Чебурашка заметил мандарин."
       : "Реакция становится лучше — прыжок добавим позже.";
 }
 

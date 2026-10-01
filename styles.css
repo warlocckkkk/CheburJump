@@ -290,16 +290,42 @@ h1 {
   display: flex;
   align-items: flex-end;
   right: 19%;
-  bottom: 34px;
+  bottom: 38px;
 }
 
 .obstacle {
+  position: relative;
   display: block;
-  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  width: clamp(2.8rem, 7vw, 4rem);
+  aspect-ratio: 1.1;
+  border: 2px solid #c85b27;
+  border-radius: 45% 45% 48% 48%;
+  background: radial-gradient(circle at 30% 25%, #ffd078, #ffa039 45%, #ed782d);
+  box-shadow: inset -4px -4px 0 rgba(179, 74, 24, 0.15);
 }
 
-.obstacle + .obstacle {
-  margin-left: -0.18em;
+.obstacle::before {
+  position: absolute;
+  top: -9px;
+  left: 46%;
+  width: 6px;
+  height: 10px;
+  border-radius: 3px;
+  background: #6c6230;
+  content: "";
+}
+
+.obstacle::after {
+  position: absolute;
+  top: -12px;
+  left: 53%;
+  width: 24px;
+  height: 13px;
+  border: 1px solid #49753c;
+  border-radius: 80% 0 80% 0;
+  background: #79a550;
+  transform: rotate(-20deg);
+  content: "";
 }
 
 .ground {
