@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 4 из 70</p>
+        <p class="eyebrow">День 5 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
-          На площадке появился мандарин с зелёным листочком. Чебурашка
-          тренируется замечать своё первое препятствие.
+          Чебурашка готов к тренировке. Нажми «Старт» и проверь свою реакцию
+          на тренировочной площадке.
         </p>
       </header>
 
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <div class="playfield" id="playfield" role="button" tabindex="0" aria-label="Тренировочное поле">
+        <div class="playfield" id="playfield" role="button" tabindex="-1" aria-label="Тренировочное поле" aria-disabled="true">
           <div class="cloud cloud--one" aria-hidden="true"></div>
           <div class="cloud cloud--two" aria-hidden="true"></div>
           <div class="character" id="character" aria-label="Чебурашка" role="img">
@@ -57,14 +57,21 @@
         </div>
 
         <div class="game-card__footer">
-          <p id="message">Кликни по площадке — начнём тренировку реакции.</p>
-          <span class="status"><span class="status__dot"></span> Подготовка</span>
+          <p id="message">Нажми «Старт», чтобы начать тренировку.</p>
+          <span class="status" data-state="ready">
+            <span class="status__dot"></span>
+            <span id="game-status">Готов</span>
+          </span>
+        </div>
+        <div class="game-controls">
+          <button class="control-button" id="start-button" type="button">Старт</button>
+          <button class="control-button control-button--secondary" id="finish-button" type="button" disabled>Завершить</button>
         </div>
       </section>
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.4</span>
+        <span>Версия 0.5</span>
       </footer>
     </main>
   </body>
