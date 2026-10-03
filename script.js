@@ -1,16 +1,25 @@
 const playfield = document.querySelector("#playfield");
+const character = document.querySelector("#character");
 const scoreElement = document.querySelector("#score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
 const finishButton = document.querySelector("#finish-button");
 
-let trainingClicks = 0;
+let trainingJumps = 0;
 let gameState = "ready";
+let isJumping = false;
+
+function resetJump() {
+  isJumping = false;
+  character.classList.remove("character--jumping");
+}
 
 function setGameState(state) {
   gameState = state;
   const isPlaying = gameState === "playing";
+
+  if (!isPlaying) resetJump();
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
@@ -23,7 +32,7 @@ function setGameState(state) {
     messageElement.textContent = "Нажми «Старт», чтобы начать тренировку.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
-    messageElement.textContent = "Кликни по площадке — тренируем реакцию.";
+    messageElement.textContent = "Кликни по площадке — Чебурашка подпрыгнет.";
   } else {
     statusElement.textContent = "Завершено";
     messageElement.textContent = "Тренировка завершена.";
@@ -41,23 +50,31 @@ finishButton.addEventListener("click", () => {
   setGameState("finished");
 });
 
-function registerTrainingClick() {
-  if (gameState !== "playing") return;
+function registerTrainingJump() {
+  if (gameState !== "playing" || isJumping) return;
 
-  trainingClicks += 1;
-  scoreElement.textContent = trainingClicks;
+  isJumping = true;
+  character.classList.add("character--jumping");
+  trainingJumps += 1;
+  scoreElement.textContent = trainingJumps;
   messageElement.textContent =
-    trainingClicks === 1
-      ? "Отлично! Чебурашка заметил мандарин."
-      : "Реакция становится лучше — прыжок добавим позже.";
+    "Прыжок! Дождись приземления и кликни снова.";
 }
 
-playfield.addEventListener("click", registerTrainingClick);
+character.addEventListener("animationend", (event) => {
+  if (event.target !== character || event.animationName !== "character-jump") return;
+  resetJump();
+  if (gameState === "playing") {
+    messageElement.textContent = "Чебурашка приземлился. Можно прыгнуть ещё раз.";
+  }
+});
+
+playfield.addEventListener("click", registerTrainingJump);
 
 playfield.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
-    registerTrainingClick();
+    if (!event.repeat) registerTrainingJump();
   }
 });
 
