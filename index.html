@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 6 из 70</p>
+        <p class="eyebrow">День 7 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
-          Чебурашка научился прыгать! Нажми «Старт», затем кликни по площадке,
-          чтобы он подпрыгнул.
+          Прыгай в своём темпе. Кнопка «Пауза» позволит сделать перерыв,
+          а «Продолжить» — вернуться к тренировке.
         </p>
       </header>
 
@@ -26,7 +26,7 @@
         <div class="game-card__header">
           <div>
             <p class="label">Тренировочная площадка</p>
-            <h2 id="game-title">Первый прыжок</h2>
+            <h2 id="game-title">Тренировка прыжков</h2>
           </div>
           <div class="score" aria-label="Количество тренировочных прыжков">
             <span class="score__label">Прыжки</span>
@@ -65,13 +65,14 @@
         </div>
         <div class="game-controls">
           <button class="control-button" id="start-button" type="button">Старт</button>
+          <button class="control-button control-button--secondary" id="pause-button" type="button" aria-pressed="false" disabled>Пауза</button>
           <button class="control-button control-button--secondary" id="finish-button" type="button" disabled>Завершить</button>
         </div>
       </section>
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.6</span>
+        <span>Версия 0.7</span>
       </footer>
     </main>
   </body>

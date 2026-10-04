@@ -4,6 +4,7 @@ const scoreElement = document.querySelector("#score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
+const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
 
 let trainingJumps = 0;
@@ -18,13 +19,18 @@ function resetJump() {
 function setGameState(state) {
   gameState = state;
   const isPlaying = gameState === "playing";
+  const isPaused = gameState === "paused";
 
-  if (!isPlaying) resetJump();
+  if (!isPlaying && !isPaused) resetJump();
+  character.classList.toggle("character--paused", isPaused);
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
   startButton.disabled = gameState !== "ready";
-  finishButton.disabled = !isPlaying;
+  pauseButton.disabled = !isPlaying && !isPaused;
+  pauseButton.textContent = isPaused ? "Продолжить" : "Пауза";
+  pauseButton.setAttribute("aria-pressed", String(isPaused));
+  finishButton.disabled = !isPlaying && !isPaused;
   statusElement.parentElement.dataset.state = gameState;
 
   if (gameState === "ready") {
@@ -32,7 +38,12 @@ function setGameState(state) {
     messageElement.textContent = "Нажми «Старт», чтобы начать тренировку.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
-    messageElement.textContent = "Кликни по площадке — Чебурашка подпрыгнет.";
+    messageElement.textContent = isJumping
+      ? "Продолжаем прыжок. Дождись приземления."
+      : "Кликни по площадке — Чебурашка подпрыгнет.";
+  } else if (isPaused) {
+    statusElement.textContent = "Пауза";
+    messageElement.textContent = "Тренировка на паузе. Нажми «Продолжить».";
   } else {
     statusElement.textContent = "Завершено";
     messageElement.textContent = "Тренировка завершена.";
@@ -45,8 +56,17 @@ startButton.addEventListener("click", () => {
   playfield.focus();
 });
 
+pauseButton.addEventListener("click", () => {
+  if (gameState === "playing") {
+    setGameState("paused");
+  } else if (gameState === "paused") {
+    setGameState("playing");
+    playfield.focus();
+  }
+});
+
 finishButton.addEventListener("click", () => {
-  if (gameState !== "playing") return;
+  if (gameState !== "playing" && gameState !== "paused") return;
   setGameState("finished");
 });
 

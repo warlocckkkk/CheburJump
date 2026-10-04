@@ -190,6 +190,10 @@ h1 {
   animation: character-jump 650ms ease-in-out;
 }
 
+.character--paused {
+  animation-play-state: paused;
+}
+
 @keyframes character-jump {
   0%, 100% {
     bottom: 36px;
@@ -383,6 +387,10 @@ h1 {
 
 .status[data-state="playing"] .status__dot {
   background: #5c9950;
+}
+
+.status[data-state="paused"] .status__dot {
+  background: var(--orange);
 }
 
 .status[data-state="finished"] .status__dot {
