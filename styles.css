@@ -315,6 +315,25 @@ h1 {
   bottom: 38px;
 }
 
+.obstacles--moving {
+  right: auto;
+  animation: mandarin-travel 4s linear infinite;
+}
+
+.obstacles--paused {
+  animation-play-state: paused;
+}
+
+@keyframes mandarin-travel {
+  from {
+    left: -80px;
+  }
+
+  to {
+    left: 100%;
+  }
+}
+
 .obstacle {
   position: relative;
   display: block;

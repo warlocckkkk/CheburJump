@@ -1,5 +1,6 @@
 const playfield = document.querySelector("#playfield");
 const character = document.querySelector("#character");
+const obstacles = document.querySelector("#obstacles");
 const scoreElement = document.querySelector("#score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
@@ -23,6 +24,8 @@ function setGameState(state) {
 
   if (!isPlaying && !isPaused) resetJump();
   character.classList.toggle("character--paused", isPaused);
+  obstacles.classList.toggle("obstacles--moving", isPlaying || isPaused);
+  obstacles.classList.toggle("obstacles--paused", isPaused);
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
@@ -40,7 +43,7 @@ function setGameState(state) {
     statusElement.textContent = "Игра идёт";
     messageElement.textContent = isJumping
       ? "Продолжаем прыжок. Дождись приземления."
-      : "Кликни по площадке — Чебурашка подпрыгнет.";
+      : "Мандарин движется! Кликни по площадке, чтобы прыгнуть.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
     messageElement.textContent = "Тренировка на паузе. Нажми «Продолжить».";
