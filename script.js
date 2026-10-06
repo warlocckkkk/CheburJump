@@ -11,6 +11,41 @@ const finishButton = document.querySelector("#finish-button");
 let trainingJumps = 0;
 let gameState = "ready";
 let isJumping = false;
+let animationFrameId = null;
+let previousFrameTime = null;
+let obstacleElapsedTime = 0;
+
+function renderObstacle() {
+  const progress = obstacleElapsedTime / 4000;
+  obstacles.style.left = `calc(${progress * 100}% - ${(1 - progress) * 80}px)`;
+}
+
+function gameLoop(timestamp) {
+  animationFrameId = null;
+  if (gameState !== "playing") return;
+
+  if (previousFrameTime !== null) {
+    obstacleElapsedTime = (obstacleElapsedTime + timestamp - previousFrameTime) % 4000;
+  }
+  previousFrameTime = timestamp;
+  renderObstacle();
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function startGameLoop() {
+  if (animationFrameId !== null) return;
+  previousFrameTime = null;
+  renderObstacle();
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function stopGameLoop() {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+  previousFrameTime = null;
+}
 
 function resetJump() {
   isJumping = false;
@@ -22,10 +57,16 @@ function setGameState(state) {
   const isPlaying = gameState === "playing";
   const isPaused = gameState === "paused";
 
-  if (!isPlaying && !isPaused) resetJump();
+  if (!isPlaying && !isPaused) {
+    resetJump();
+    obstacleElapsedTime = 0;
+    obstacles.style.removeProperty("left");
+  }
   character.classList.toggle("character--paused", isPaused);
   obstacles.classList.toggle("obstacles--moving", isPlaying || isPaused);
-  obstacles.classList.toggle("obstacles--paused", isPaused);
+
+  if (isPlaying) startGameLoop();
+  else stopGameLoop();
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
