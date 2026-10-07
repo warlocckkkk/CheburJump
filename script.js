@@ -7,6 +7,7 @@ const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
+const restartButton = document.querySelector("#restart-button");
 
 let trainingJumps = 0;
 let gameState = "ready";
@@ -75,6 +76,7 @@ function setGameState(state) {
   pauseButton.textContent = isPaused ? "Продолжить" : "Пауза";
   pauseButton.setAttribute("aria-pressed", String(isPaused));
   finishButton.disabled = !isPlaying && !isPaused;
+  restartButton.disabled = gameState === "ready";
   statusElement.parentElement.dataset.state = gameState;
 
   if (gameState === "ready") {
@@ -90,7 +92,7 @@ function setGameState(state) {
     messageElement.textContent = "Тренировка на паузе. Нажми «Продолжить».";
   } else {
     statusElement.textContent = "Завершено";
-    messageElement.textContent = "Тренировка завершена.";
+    messageElement.textContent = "Тренировка завершена. Нажми «Заново», чтобы начать ещё раз.";
   }
 }
 
@@ -112,6 +114,16 @@ pauseButton.addEventListener("click", () => {
 finishButton.addEventListener("click", () => {
   if (gameState !== "playing" && gameState !== "paused") return;
   setGameState("finished");
+});
+
+restartButton.addEventListener("click", () => {
+  if (gameState === "ready") return;
+
+  setGameState("ready");
+  trainingJumps = 0;
+  scoreElement.textContent = trainingJumps;
+  setGameState("playing");
+  playfield.focus();
 });
 
 function registerTrainingJump() {
