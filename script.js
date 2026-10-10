@@ -15,28 +15,55 @@ let isJumping = false;
 let animationFrameId = null;
 let previousFrameTime = null;
 let obstacleElapsedTime = 0;
+let jumpElapsedTime = 0;
 
-function renderObstacle() {
+// x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
+const characterPosition = { x: 0, y: 36 };
+const obstaclePosition = { x: 0, y: 38 };
+
+function updatePositions() {
+  const fieldWidth = playfield.clientWidth;
+  characterPosition.x = fieldWidth * 0.2;
   const progress = obstacleElapsedTime / 4000;
-  obstacles.style.left = `calc(${progress * 100}% - ${(1 - progress) * 80}px)`;
+  obstaclePosition.x = gameState === "playing" || gameState === "paused"
+    ? -80 + (fieldWidth + 80) * progress
+    : fieldWidth * 0.81 - obstacles.offsetWidth;
+
+  character.style.left = `${characterPosition.x}px`;
+  character.style.bottom = `${characterPosition.y}px`;
+  obstacles.style.left = `${obstaclePosition.x}px`;
+  obstacles.style.bottom = `${obstaclePosition.y}px`;
+}
+
+function updateJump(deltaTime) {
+  if (!isJumping) return;
+
+  jumpElapsedTime = Math.min(jumpElapsedTime + deltaTime, 650);
+  const progress = jumpElapsedTime / 650;
+  characterPosition.y = 36 + 110 * (1 - Math.cos(progress * Math.PI * 2)) / 2;
+
+  if (jumpElapsedTime === 650) {
+    resetJump();
+    messageElement.textContent = "Чебурашка приземлился. Можно прыгнуть ещё раз.";
+  }
 }
 
 function gameLoop(timestamp) {
   animationFrameId = null;
   if (gameState !== "playing") return;
 
-  if (previousFrameTime !== null) {
-    obstacleElapsedTime = (obstacleElapsedTime + timestamp - previousFrameTime) % 4000;
-  }
+  const deltaTime = previousFrameTime === null ? 0 : timestamp - previousFrameTime;
+  obstacleElapsedTime = (obstacleElapsedTime + deltaTime) % 4000;
+  updateJump(deltaTime);
   previousFrameTime = timestamp;
-  renderObstacle();
+  updatePositions();
   animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 function startGameLoop() {
   if (animationFrameId !== null) return;
   previousFrameTime = null;
-  renderObstacle();
+  updatePositions();
   animationFrameId = requestAnimationFrame(gameLoop);
 }
 
@@ -50,7 +77,8 @@ function stopGameLoop() {
 
 function resetJump() {
   isJumping = false;
-  character.classList.remove("character--jumping");
+  jumpElapsedTime = 0;
+  characterPosition.y = 36;
 }
 
 function setGameState(state) {
@@ -61,13 +89,13 @@ function setGameState(state) {
   if (!isPlaying && !isPaused) {
     resetJump();
     obstacleElapsedTime = 0;
-    obstacles.style.removeProperty("left");
   }
-  character.classList.toggle("character--paused", isPaused);
-  obstacles.classList.toggle("obstacles--moving", isPlaying || isPaused);
 
   if (isPlaying) startGameLoop();
-  else stopGameLoop();
+  else {
+    stopGameLoop();
+    updatePositions();
+  }
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
@@ -130,20 +158,12 @@ function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
   isJumping = true;
-  character.classList.add("character--jumping");
+  jumpElapsedTime = 0;
   trainingJumps += 1;
   scoreElement.textContent = trainingJumps;
   messageElement.textContent =
     "Прыжок! Дождись приземления и кликни снова.";
 }
-
-character.addEventListener("animationend", (event) => {
-  if (event.target !== character || event.animationName !== "character-jump") return;
-  resetJump();
-  if (gameState === "playing") {
-    messageElement.textContent = "Чебурашка приземлился. Можно прыгнуть ещё раз.";
-  }
-});
 
 playfield.addEventListener("click", registerTrainingJump);
 
@@ -153,5 +173,7 @@ playfield.addEventListener("keydown", (event) => {
     if (!event.repeat) registerTrainingJump();
   }
 });
+
+window.addEventListener("resize", updatePositions);
 
 setGameState("ready");

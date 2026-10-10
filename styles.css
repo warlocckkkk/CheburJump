@@ -182,26 +182,6 @@ h1 {
 .character {
   width: 132px;
   height: 138px;
-  bottom: 36px;
-  left: 20%;
-}
-
-.character--jumping {
-  animation: character-jump 650ms ease-in-out;
-}
-
-.character--paused {
-  animation-play-state: paused;
-}
-
-@keyframes character-jump {
-  0%, 100% {
-    bottom: 36px;
-  }
-
-  50% {
-    bottom: 146px;
-  }
 }
 
 .character__body {
@@ -311,12 +291,6 @@ h1 {
 .obstacles {
   display: flex;
   align-items: flex-end;
-  right: 19%;
-  bottom: 38px;
-}
-
-.obstacles--moving {
-  right: auto;
 }
 
 .obstacle {
