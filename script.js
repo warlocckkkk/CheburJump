@@ -15,16 +15,15 @@ let isJumping = false;
 let animationFrameId = null;
 let previousFrameTime = null;
 let obstacleElapsedTime = 0;
-let jumpElapsedTime = 0;
 let verticalVelocity = 0;
 
 // Начальная скорость — пиксели в секунду, гравитация — пиксели в секунду за секунду.
 const jumpSpeed = 680;
 const gravity = 2100;
-const jumpDuration = (2 * jumpSpeed / gravity) * 1000;
+const groundLevel = 36;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
-const characterPosition = { x: 0, y: 36 };
+const characterPosition = { x: 0, y: groundLevel };
 const obstaclePosition = { x: 0, y: 38 };
 
 function updatePositions() {
@@ -44,13 +43,11 @@ function updatePositions() {
 function updateJump(deltaTime) {
   if (!isJumping) return;
 
-  const previousJumpTime = jumpElapsedTime;
-  jumpElapsedTime = Math.min(jumpElapsedTime + deltaTime, jumpDuration);
-  const deltaSeconds = (jumpElapsedTime - previousJumpTime) / 1000;
+  const deltaSeconds = deltaTime / 1000;
   characterPosition.y += verticalVelocity * deltaSeconds - gravity * deltaSeconds ** 2 / 2;
   verticalVelocity -= gravity * deltaSeconds;
 
-  if (jumpElapsedTime === jumpDuration) {
+  if (characterPosition.y <= groundLevel && verticalVelocity <= 0) {
     resetJump();
     messageElement.textContent = "Чебурашка приземлился. Можно прыгнуть ещё раз.";
   }
@@ -85,9 +82,8 @@ function stopGameLoop() {
 
 function resetJump() {
   isJumping = false;
-  jumpElapsedTime = 0;
   verticalVelocity = 0;
-  characterPosition.y = 36;
+  characterPosition.y = groundLevel;
 }
 
 function setGameState(state) {
@@ -167,7 +163,6 @@ function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
   isJumping = true;
-  jumpElapsedTime = 0;
   verticalVelocity = jumpSpeed;
   trainingJumps += 1;
   scoreElement.textContent = trainingJumps;
