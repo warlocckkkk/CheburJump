@@ -1,5 +1,8 @@
 const playfield = document.querySelector("#playfield");
 const character = document.querySelector("#character");
+const characterParts = character.querySelectorAll(
+  ".character__body, .character__head, .character__ear"
+);
 const obstacles = document.querySelector("#obstacles");
 const scoreElement = document.querySelector("#score");
 const messageElement = document.querySelector("#message");
@@ -21,6 +24,8 @@ let verticalVelocity = 0;
 const jumpSpeed = 680;
 const gravity = 2100;
 const groundLevel = 36;
+// Постоянная скорость в пикселях в секунду позволяет перепрыгнуть мандарин на узком поле.
+const obstacleSpeed = 425;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
@@ -29,10 +34,9 @@ const obstaclePosition = { x: 0, y: 38 };
 function updatePositions() {
   const fieldWidth = playfield.clientWidth;
   characterPosition.x = fieldWidth * 0.2;
-  const progress = obstacleElapsedTime / 4000;
-  obstaclePosition.x = gameState === "playing" || gameState === "paused"
-    ? -80 + (fieldWidth + 80) * progress
-    : fieldWidth * 0.81 - obstacles.offsetWidth;
+  obstaclePosition.x = gameState === "ready"
+    ? fieldWidth * 0.81 - obstacles.offsetWidth
+    : -80 + obstacleElapsedTime / 1000 * obstacleSpeed;
 
   character.style.left = `${characterPosition.x}px`;
   character.style.bottom = `${characterPosition.y}px`;
@@ -53,15 +57,42 @@ function updateJump(deltaTime) {
   }
 }
 
+function hasCollision() {
+  const obstacleBounds = obstacles.getBoundingClientRect();
+
+  // Границы деталей учитывают CSS-масштаб и исключают пустое место вокруг спрайта.
+  for (const part of characterParts) {
+    const characterBounds = part.getBoundingClientRect();
+    if (
+      characterBounds.left <= obstacleBounds.right &&
+      characterBounds.right >= obstacleBounds.left &&
+      characterBounds.top <= obstacleBounds.bottom &&
+      characterBounds.bottom >= obstacleBounds.top
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function gameLoop(timestamp) {
   animationFrameId = null;
   if (gameState !== "playing") return;
 
   const deltaTime = previousFrameTime === null ? 0 : timestamp - previousFrameTime;
-  obstacleElapsedTime = (obstacleElapsedTime + deltaTime) % 4000;
+  const obstacleTravelTime = (playfield.clientWidth + 80) / obstacleSpeed * 1000;
+  obstacleElapsedTime = (obstacleElapsedTime + deltaTime) % obstacleTravelTime;
   updateJump(deltaTime);
   previousFrameTime = timestamp;
   updatePositions();
+
+  if (hasCollision()) {
+    setGameState("finished");
+    messageElement.textContent = "Столкновение с мандарином! Нажми «Заново», чтобы попробовать ещё раз.";
+    return;
+  }
+
   animationFrameId = requestAnimationFrame(gameLoop);
 }
 
@@ -91,7 +122,7 @@ function setGameState(state) {
   const isPlaying = gameState === "playing";
   const isPaused = gameState === "paused";
 
-  if (!isPlaying && !isPaused) {
+  if (gameState === "ready") {
     resetJump();
     obstacleElapsedTime = 0;
   }
