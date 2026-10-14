@@ -5,6 +5,7 @@ const characterParts = character.querySelectorAll(
 );
 const obstacles = document.querySelector("#obstacles");
 const scoreElement = document.querySelector("#score");
+const livesElement = document.querySelector("#lives");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
@@ -13,6 +14,7 @@ const finishButton = document.querySelector("#finish-button");
 const restartButton = document.querySelector("#restart-button");
 
 let trainingJumps = 0;
+let lives = 3;
 let gameState = "ready";
 let isJumping = false;
 let animationFrameId = null;
@@ -88,9 +90,19 @@ function gameLoop(timestamp) {
   updatePositions();
 
   if (hasCollision()) {
-    setGameState("finished");
-    messageElement.textContent = "Столкновение с мандарином! Нажми «Заново», чтобы попробовать ещё раз.";
-    return;
+    lives -= 1;
+    livesElement.textContent = lives;
+
+    if (lives === 0) {
+      setGameState("finished");
+      messageElement.textContent = "Жизни закончились. Нажми «Заново», чтобы начать новую тренировку.";
+      return;
+    }
+
+    resetJump();
+    obstacleElapsedTime = 0;
+    updatePositions();
+    messageElement.textContent = `Столкновение! Осталось жизней: ${lives}. Готовься к новому мандарину.`;
   }
 
   animationFrameId = requestAnimationFrame(gameLoop);
@@ -125,6 +137,8 @@ function setGameState(state) {
   if (gameState === "ready") {
     resetJump();
     obstacleElapsedTime = 0;
+    lives = 3;
+    livesElement.textContent = lives;
   }
 
   if (isPlaying) startGameLoop();

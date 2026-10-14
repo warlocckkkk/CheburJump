@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 14 из 70</p>
+        <p class="eyebrow">День 15 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
-          Перепрыгивай мандарин: при столкновении тренировка останавливается.
-          Нажми «Заново», чтобы попробовать ещё раз.
+          У Чебурашки три жизни. Каждое столкновение с мандарином забирает одну.
+          Нажми «Заново», чтобы восстановить все три.
         </p>
       </header>
 
@@ -28,9 +28,15 @@
             <p class="label">Тренировочная площадка</p>
             <h2 id="game-title">Тренировка с мандарином</h2>
           </div>
-          <div class="score" aria-label="Количество тренировочных прыжков">
-            <span class="score__label">Прыжки</span>
-            <span class="score__value" id="score">0</span>
+          <div class="game-stats">
+            <div class="score" aria-label="Количество тренировочных прыжков">
+              <span class="score__label">Прыжки</span>
+              <span class="score__value" id="score">0</span>
+            </div>
+            <div class="score score--lives" aria-label="Оставшиеся жизни">
+              <span class="score__label">Жизни</span>
+              <span class="score__value" id="lives">3</span>
+            </div>
           </div>
         </div>
 
@@ -73,7 +79,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.14</span>
+        <span>Версия 0.15</span>
       </footer>
     </main>
   </body>
