@@ -13,7 +13,8 @@ const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
 const restartButton = document.querySelector("#restart-button");
 
-let trainingJumps = 0;
+let score = 0;
+let obstaclePassed = false;
 let lives = 3;
 let gameState = "ready";
 let isJumping = false;
@@ -78,13 +79,34 @@ function hasCollision() {
   return false;
 }
 
+function updateScore() {
+  if (obstaclePassed) return;
+
+  const obstacleBounds = obstacles.getBoundingClientRect();
+  const characterRight = Math.max(
+    ...Array.from(characterParts, (part) => part.getBoundingClientRect().right)
+  );
+
+  if (obstacleBounds.left > characterRight) {
+    obstaclePassed = true;
+    score += 1;
+    scoreElement.textContent = score;
+    messageElement.textContent = "Мандарин позади! +1 очко.";
+  }
+}
+
 function gameLoop(timestamp) {
   animationFrameId = null;
   if (gameState !== "playing") return;
 
-  const deltaTime = previousFrameTime === null ? 0 : timestamp - previousFrameTime;
+  // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
+  const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, 50);
   const obstacleTravelTime = (playfield.clientWidth + 80) / obstacleSpeed * 1000;
-  obstacleElapsedTime = (obstacleElapsedTime + deltaTime) % obstacleTravelTime;
+  obstacleElapsedTime += deltaTime;
+  if (obstacleElapsedTime >= obstacleTravelTime) {
+    obstacleElapsedTime %= obstacleTravelTime;
+    obstaclePassed = false;
+  }
   updateJump(deltaTime);
   previousFrameTime = timestamp;
   updatePositions();
@@ -101,8 +123,11 @@ function gameLoop(timestamp) {
 
     resetJump();
     obstacleElapsedTime = 0;
+    obstaclePassed = false;
     updatePositions();
     messageElement.textContent = `Столкновение! Осталось жизней: ${lives}. Готовься к новому мандарину.`;
+  } else {
+    updateScore();
   }
 
   animationFrameId = requestAnimationFrame(gameLoop);
@@ -137,6 +162,9 @@ function setGameState(state) {
   if (gameState === "ready") {
     resetJump();
     obstacleElapsedTime = 0;
+    obstaclePassed = false;
+    score = 0;
+    scoreElement.textContent = score;
     lives = 3;
     livesElement.textContent = lives;
   }
@@ -198,8 +226,6 @@ restartButton.addEventListener("click", () => {
   if (gameState === "ready") return;
 
   setGameState("ready");
-  trainingJumps = 0;
-  scoreElement.textContent = trainingJumps;
   setGameState("playing");
   playfield.focus();
 });
@@ -209,8 +235,6 @@ function registerTrainingJump() {
 
   isJumping = true;
   verticalVelocity = jumpSpeed;
-  trainingJumps += 1;
-  scoreElement.textContent = trainingJumps;
   messageElement.textContent =
     "Прыжок! Дождись приземления и кликни снова.";
 }
