@@ -6,6 +6,8 @@ const characterParts = character.querySelectorAll(
 const obstacles = document.querySelector("#obstacles");
 const scoreElement = document.querySelector("#score");
 const livesElement = document.querySelector("#lives");
+const resultScreen = document.querySelector("#result-screen");
+const resultScoreElement = document.querySelector("#result-score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
@@ -184,6 +186,13 @@ function setGameState(state) {
   finishButton.disabled = !isPlaying && !isPaused;
   restartButton.disabled = gameState === "ready";
   statusElement.parentElement.dataset.state = gameState;
+  playfield.hidden = gameState === "finished";
+  resultScreen.hidden = gameState !== "finished";
+
+  if (gameState === "finished") {
+    resultScoreElement.textContent = score;
+    restartButton.focus();
+  }
 
   if (gameState === "ready") {
     statusElement.textContent = "Готов";

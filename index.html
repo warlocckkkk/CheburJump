@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 16 из 70</p>
+        <p class="eyebrow">День 17 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Перепрыгивай мандарины: каждое пройденное препятствие приносит одно очко.
@@ -62,6 +62,13 @@
           <div class="ground" aria-hidden="true"></div>
         </div>
 
+        <section class="result-screen" id="result-screen" aria-labelledby="result-title" hidden>
+          <h2 id="result-title">Тренировка завершена</h2>
+          <p class="result-screen__label">Итоговый счёт</p>
+          <p class="result-screen__score" id="result-score">0</p>
+          <p class="result-screen__hint">Нажми «Заново», чтобы попробовать ещё раз.</p>
+        </section>
+
         <div class="game-card__footer">
           <p id="message">Нажми «Старт», чтобы начать тренировку.</p>
           <span class="status" data-state="ready">
@@ -79,7 +86,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.16</span>
+        <span>Версия 0.17</span>
       </footer>
     </main>
   </body>
