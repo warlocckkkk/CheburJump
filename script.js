@@ -5,9 +5,11 @@ const characterParts = character.querySelectorAll(
 );
 const obstacles = document.querySelector("#obstacles");
 const scoreElement = document.querySelector("#score");
+const bestScoreElement = document.querySelector("#best-score");
 const livesElement = document.querySelector("#lives");
 const resultScreen = document.querySelector("#result-screen");
 const resultScoreElement = document.querySelector("#result-score");
+const resultBestScoreElement = document.querySelector("#result-best-score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const startButton = document.querySelector("#start-button");
@@ -15,6 +17,8 @@ const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
 const restartButton = document.querySelector("#restart-button");
 
+const bestScoreKey = "cheburJump.bestScore";
+let bestScore = loadBestScore();
 let score = 0;
 let obstaclePassed = false;
 let lives = 3;
@@ -35,6 +39,29 @@ const obstacleSpeed = 425;
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
 const obstaclePosition = { x: 0, y: 38 };
+
+function loadBestScore() {
+  try {
+    const savedScore = Number(localStorage.getItem(bestScoreKey));
+    return Number.isSafeInteger(savedScore) && savedScore >= 0 ? savedScore : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function updateBestScore() {
+  if (score <= bestScore) return;
+
+  bestScore = Math.max(score, loadBestScore());
+  bestScoreElement.textContent = bestScore;
+  resultBestScoreElement.textContent = bestScore;
+
+  try {
+    localStorage.setItem(bestScoreKey, String(bestScore));
+  } catch {
+    // Если хранилище недоступно, рекорд останется только до перезагрузки страницы.
+  }
+}
 
 function updatePositions() {
   const fieldWidth = playfield.clientWidth;
@@ -93,6 +120,7 @@ function updateScore() {
     obstaclePassed = true;
     score += 1;
     scoreElement.textContent = score;
+    updateBestScore();
     messageElement.textContent = "Мандарин позади! +1 очко.";
   }
 }
@@ -259,4 +287,6 @@ playfield.addEventListener("keydown", (event) => {
 
 window.addEventListener("resize", updatePositions);
 
+bestScoreElement.textContent = bestScore;
+resultBestScoreElement.textContent = bestScore;
 setGameState("ready");

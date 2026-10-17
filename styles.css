@@ -93,6 +93,12 @@ h1 {
   font-size: clamp(1.25rem, 3vw, 1.8rem);
 }
 
+.best-score {
+  margin: 8px 0 0;
+  color: var(--purple-dark);
+  font-weight: 700;
+}
+
 .game-stats {
   display: flex;
   flex-shrink: 0;

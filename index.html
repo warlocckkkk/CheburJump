@@ -14,11 +14,11 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 17 из 70</p>
+        <p class="eyebrow">День 18 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Перепрыгивай мандарины: каждое пройденное препятствие приносит одно очко.
-          У Чебурашки три жизни, а «Заново» начинает игру с нуля.
+          У Чебурашки три жизни. «Заново» сбрасывает очки, но сохраняет рекорд в этом браузере.
         </p>
       </header>
 
@@ -27,6 +27,7 @@
           <div>
             <p class="label">Тренировочная площадка</p>
             <h2 id="game-title">Тренировка с мандарином</h2>
+            <p class="best-score">Рекорд: <span id="best-score">0</span></p>
           </div>
           <div class="game-stats">
             <div class="score" aria-label="Очки за успешно пройденные мандарины">
@@ -66,6 +67,7 @@
           <h2 id="result-title">Тренировка завершена</h2>
           <p class="result-screen__label">Итоговый счёт</p>
           <p class="result-screen__score" id="result-score">0</p>
+          <p class="result-screen__label">Рекорд: <span id="result-best-score">0</span></p>
           <p class="result-screen__hint">Нажми «Заново», чтобы попробовать ещё раз.</p>
         </section>
 
@@ -86,7 +88,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.17</span>
+        <span>Версия 0.18</span>
       </footer>
     </main>
   </body>
