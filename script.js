@@ -147,7 +147,7 @@ function gameLoop(timestamp) {
 
     if (lives === 0) {
       setGameState("finished");
-      messageElement.textContent = "Жизни закончились. Нажми «Заново», чтобы начать новую тренировку.";
+      messageElement.textContent = "Жизни закончились. Нажми пробел или «Заново», чтобы начать новую тренировку.";
       return;
     }
 
@@ -235,7 +235,7 @@ function setGameState(state) {
     messageElement.textContent = "Тренировка на паузе. Нажми «Продолжить».";
   } else {
     statusElement.textContent = "Завершено";
-    messageElement.textContent = "Тренировка завершена. Нажми «Заново», чтобы начать ещё раз.";
+    messageElement.textContent = "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";
   }
 }
 
@@ -259,13 +259,15 @@ finishButton.addEventListener("click", () => {
   setGameState("finished");
 });
 
-restartButton.addEventListener("click", () => {
+function restartGame() {
   if (gameState === "ready") return;
 
   setGameState("ready");
   setGameState("playing");
   playfield.focus();
-});
+}
+
+restartButton.addEventListener("click", restartGame);
 
 function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
@@ -283,6 +285,14 @@ playfield.addEventListener("keydown", (event) => {
     event.preventDefault();
     if (!event.repeat) registerTrainingJump();
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (gameState !== "finished" || event.key !== " ") return;
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+  event.preventDefault();
+  if (!event.repeat) restartGame();
 });
 
 window.addEventListener("resize", updatePositions);
