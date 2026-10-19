@@ -8,6 +8,7 @@ const scoreElement = document.querySelector("#score");
 const bestScoreElement = document.querySelector("#best-score");
 const livesElement = document.querySelector("#lives");
 const resultScreen = document.querySelector("#result-screen");
+const resultTitleElement = document.querySelector("#result-title");
 const resultScoreElement = document.querySelector("#result-score");
 const resultBestScoreElement = document.querySelector("#result-best-score");
 const messageElement = document.querySelector("#message");
@@ -21,6 +22,7 @@ const bestScoreKey = "cheburJump.bestScore";
 let bestScore = loadBestScore();
 let score = 0;
 let obstaclePassed = false;
+let preserveScoreMessage = false;
 let lives = 3;
 let gameState = "ready";
 let isJumping = false;
@@ -85,7 +87,11 @@ function updateJump(deltaTime) {
 
   if (characterPosition.y <= groundLevel && verticalVelocity <= 0) {
     resetJump();
-    messageElement.textContent = "Чебурашка приземлился. Можно прыгнуть ещё раз.";
+    if (!preserveScoreMessage) {
+      messageElement.textContent = obstaclePassed
+        ? "Чебурашка на земле. Мандарин пройден — жди следующий."
+        : "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка.";
+    }
   }
 }
 
@@ -121,7 +127,8 @@ function updateScore() {
     score += 1;
     scoreElement.textContent = score;
     updateBestScore();
-    messageElement.textContent = "Мандарин позади! +1 очко.";
+    preserveScoreMessage = true;
+    messageElement.textContent = `Мандарин позади! +1 очко. Текущий счёт: ${score}.`;
   }
 }
 
@@ -136,18 +143,20 @@ function gameLoop(timestamp) {
   if (obstacleElapsedTime >= obstacleTravelTime) {
     obstacleElapsedTime %= obstacleTravelTime;
     obstaclePassed = false;
+    preserveScoreMessage = false;
+    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
   }
   updateJump(deltaTime);
   previousFrameTime = timestamp;
   updatePositions();
 
   if (hasCollision()) {
+    preserveScoreMessage = false;
     lives -= 1;
     livesElement.textContent = lives;
 
     if (lives === 0) {
       setGameState("finished");
-      messageElement.textContent = "Жизни закончились. Нажми пробел или «Заново», чтобы начать новую тренировку.";
       return;
     }
 
@@ -155,7 +164,9 @@ function gameLoop(timestamp) {
     obstacleElapsedTime = 0;
     obstaclePassed = false;
     updatePositions();
-    messageElement.textContent = `Столкновение! Осталось жизней: ${lives}. Готовься к новому мандарину.`;
+    messageElement.textContent = lives === 1
+      ? "Столкновение! Осталась последняя жизнь. Мандарин начинает путь заново."
+      : `Столкновение! Осталось ${lives} жизни. Мандарин начинает путь заново.`;
   } else {
     updateScore();
   }
@@ -186,8 +197,10 @@ function resetJump() {
 
 function setGameState(state) {
   gameState = state;
+  preserveScoreMessage = false;
   const isPlaying = gameState === "playing";
   const isPaused = gameState === "paused";
+  const isGameOver = gameState === "finished" && lives === 0;
 
   if (gameState === "ready") {
     resetJump();
@@ -213,29 +226,34 @@ function setGameState(state) {
   pauseButton.setAttribute("aria-pressed", String(isPaused));
   finishButton.disabled = !isPlaying && !isPaused;
   restartButton.disabled = gameState === "ready";
-  statusElement.parentElement.dataset.state = gameState;
+  statusElement.parentElement.dataset.state = isGameOver ? "lost" : gameState;
   playfield.hidden = gameState === "finished";
   resultScreen.hidden = gameState !== "finished";
 
   if (gameState === "finished") {
+    resultTitleElement.textContent = isGameOver ? "Жизни закончились" : "Тренировка завершена";
     resultScoreElement.textContent = score;
     restartButton.focus();
   }
 
   if (gameState === "ready") {
-    statusElement.textContent = "Готов";
-    messageElement.textContent = "Нажми «Старт», чтобы начать тренировку.";
+    statusElement.textContent = "Готов к старту";
+    messageElement.textContent = "Нажми «Старт», затем прыгай кликом по полю или пробелом.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
     messageElement.textContent = isJumping
-      ? "Продолжаем прыжок. Дождись приземления."
-      : "Мандарин движется! Кликни по площадке, чтобы прыгнуть.";
+      ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
+      : obstaclePassed
+        ? "Мандарин пройден. Следующий скоро появится."
+        : "Клик по полю или пробел — прыжок. Перепрыгни мандарин.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
-    messageElement.textContent = "Тренировка на паузе. Нажми «Продолжить».";
+    messageElement.textContent = "Пауза: всё движение остановлено. Нажми «Продолжить», чтобы играть с того же места.";
   } else {
-    statusElement.textContent = "Завершено";
-    messageElement.textContent = "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";
+    statusElement.textContent = isGameOver ? "Проигрыш" : "Завершено";
+    messageElement.textContent = isGameOver
+      ? "Жизни закончились. Нажми пробел или «Заново», чтобы начать новую тренировку."
+      : "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";
   }
 }
 
@@ -272,10 +290,11 @@ restartButton.addEventListener("click", restartGame);
 function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
+  preserveScoreMessage = false;
   isJumping = true;
   verticalVelocity = jumpSpeed;
   messageElement.textContent =
-    "Прыжок! Дождись приземления и кликни снова.";
+    "Прыжок! Дождись приземления перед следующим прыжком.";
 }
 
 playfield.addEventListener("click", registerTrainingJump);

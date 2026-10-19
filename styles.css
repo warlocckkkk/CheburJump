@@ -425,6 +425,14 @@ h1 {
   background: var(--muted);
 }
 
+.status[data-state="lost"] {
+  color: #a33b32;
+}
+
+.status[data-state="lost"] .status__dot {
+  background: currentColor;
+}
+
 .game-controls {
   display: flex;
   flex-wrap: wrap;
