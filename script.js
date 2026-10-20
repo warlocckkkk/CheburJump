@@ -19,11 +19,29 @@ const finishButton = document.querySelector("#finish-button");
 const restartButton = document.querySelector("#restart-button");
 
 const bestScoreKey = "cheburJump.bestScore";
+const initialLives = 3;
+
+// Горизонтальные коэффициенты — доли ширины поля, остальные позиции — пиксели.
+const groundLevel = 36;
+const obstacleGroundLevel = 38;
+const obstacleStartX = -80;
+const characterXRatio = 0.2;
+const obstacleReadyXRatio = 0.81;
+
+// Скорости — пиксели в секунду, гравитация — пиксели в секунду за секунду.
+const jumpSpeed = 680;
+const gravity = 2100;
+const obstacleSpeed = 425;
+
+// Временные интервалы заданы в миллисекундах.
+const millisecondsPerSecond = 1000;
+const maxFrameDelta = 50;
+
 let bestScore = loadBestScore();
 let score = 0;
 let obstaclePassed = false;
 let preserveScoreMessage = false;
-let lives = 3;
+let lives = initialLives;
 let gameState = "ready";
 let isJumping = false;
 let animationFrameId = null;
@@ -31,16 +49,9 @@ let previousFrameTime = null;
 let obstacleElapsedTime = 0;
 let verticalVelocity = 0;
 
-// Начальная скорость — пиксели в секунду, гравитация — пиксели в секунду за секунду.
-const jumpSpeed = 680;
-const gravity = 2100;
-const groundLevel = 36;
-// Постоянная скорость в пикселях в секунду позволяет перепрыгнуть мандарин на узком поле.
-const obstacleSpeed = 425;
-
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
-const obstaclePosition = { x: 0, y: 38 };
+const obstaclePosition = { x: 0, y: obstacleGroundLevel };
 
 function loadBestScore() {
   try {
@@ -67,10 +78,10 @@ function updateBestScore() {
 
 function updatePositions() {
   const fieldWidth = playfield.clientWidth;
-  characterPosition.x = fieldWidth * 0.2;
+  characterPosition.x = fieldWidth * characterXRatio;
   obstaclePosition.x = gameState === "ready"
-    ? fieldWidth * 0.81 - obstacles.offsetWidth
-    : -80 + obstacleElapsedTime / 1000 * obstacleSpeed;
+    ? fieldWidth * obstacleReadyXRatio - obstacles.offsetWidth
+    : obstacleStartX + obstacleElapsedTime / millisecondsPerSecond * obstacleSpeed;
 
   character.style.left = `${characterPosition.x}px`;
   character.style.bottom = `${characterPosition.y}px`;
@@ -81,7 +92,7 @@ function updatePositions() {
 function updateJump(deltaTime) {
   if (!isJumping) return;
 
-  const deltaSeconds = deltaTime / 1000;
+  const deltaSeconds = deltaTime / millisecondsPerSecond;
   characterPosition.y += verticalVelocity * deltaSeconds - gravity * deltaSeconds ** 2 / 2;
   verticalVelocity -= gravity * deltaSeconds;
 
@@ -137,8 +148,8 @@ function gameLoop(timestamp) {
   if (gameState !== "playing") return;
 
   // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
-  const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, 50);
-  const obstacleTravelTime = (playfield.clientWidth + 80) / obstacleSpeed * 1000;
+  const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, maxFrameDelta);
+  const obstacleTravelTime = (playfield.clientWidth - obstacleStartX) / obstacleSpeed * millisecondsPerSecond;
   obstacleElapsedTime += deltaTime;
   if (obstacleElapsedTime >= obstacleTravelTime) {
     obstacleElapsedTime %= obstacleTravelTime;
@@ -151,7 +162,6 @@ function gameLoop(timestamp) {
   updatePositions();
 
   if (hasCollision()) {
-    preserveScoreMessage = false;
     lives -= 1;
     livesElement.textContent = lives;
 
@@ -160,9 +170,7 @@ function gameLoop(timestamp) {
       return;
     }
 
-    resetJump();
-    obstacleElapsedTime = 0;
-    obstaclePassed = false;
+    resetScene();
     updatePositions();
     messageElement.textContent = lives === 1
       ? "Столкновение! Осталась последняя жизнь. Мандарин начинает путь заново."
@@ -195,6 +203,13 @@ function resetJump() {
   characterPosition.y = groundLevel;
 }
 
+function resetScene() {
+  resetJump();
+  obstacleElapsedTime = 0;
+  obstaclePassed = false;
+  preserveScoreMessage = false;
+}
+
 function setGameState(state) {
   gameState = state;
   preserveScoreMessage = false;
@@ -203,12 +218,10 @@ function setGameState(state) {
   const isGameOver = gameState === "finished" && lives === 0;
 
   if (gameState === "ready") {
-    resetJump();
-    obstacleElapsedTime = 0;
-    obstaclePassed = false;
+    resetScene();
     score = 0;
     scoreElement.textContent = score;
-    lives = 3;
+    lives = initialLives;
     livesElement.textContent = lives;
   }
 
