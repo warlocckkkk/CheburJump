@@ -31,7 +31,9 @@ const obstacleReadyXRatio = 0.81;
 // Скорости — пиксели в секунду, гравитация — пиксели в секунду за секунду.
 const jumpSpeed = 680;
 const gravity = 2100;
-const obstacleSpeed = 425;
+const initialObstacleSpeed = 425;
+const obstacleSpeedStep = 10;
+const maxObstacleSpeed = 500;
 
 // Временные интервалы заданы в миллисекундах.
 const millisecondsPerSecond = 1000;
@@ -47,6 +49,7 @@ let isJumping = false;
 let animationFrameId = null;
 let previousFrameTime = null;
 let obstacleElapsedTime = 0;
+let currentObstacleSpeed = initialObstacleSpeed;
 let verticalVelocity = 0;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
@@ -81,7 +84,7 @@ function updatePositions() {
   characterPosition.x = fieldWidth * characterXRatio;
   obstaclePosition.x = gameState === "ready"
     ? fieldWidth * obstacleReadyXRatio - obstacles.offsetWidth
-    : obstacleStartX + obstacleElapsedTime / millisecondsPerSecond * obstacleSpeed;
+    : obstacleStartX + obstacleElapsedTime / millisecondsPerSecond * currentObstacleSpeed;
 
   character.style.left = `${characterPosition.x}px`;
   character.style.bottom = `${characterPosition.y}px`;
@@ -149,10 +152,12 @@ function gameLoop(timestamp) {
 
   // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
   const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, maxFrameDelta);
-  const obstacleTravelTime = (playfield.clientWidth - obstacleStartX) / obstacleSpeed * millisecondsPerSecond;
+  const obstacleTravelTime = (playfield.clientWidth - obstacleStartX) / currentObstacleSpeed * millisecondsPerSecond;
   obstacleElapsedTime += deltaTime;
   if (obstacleElapsedTime >= obstacleTravelTime) {
     obstacleElapsedTime %= obstacleTravelTime;
+    // Новый темп включается только для следующего прохода мандарина.
+    currentObstacleSpeed = Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed);
     obstaclePassed = false;
     preserveScoreMessage = false;
     messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
@@ -218,6 +223,7 @@ function setGameState(state) {
   const isGameOver = gameState === "finished" && lives === 0;
 
   if (gameState === "ready") {
+    currentObstacleSpeed = initialObstacleSpeed;
     resetScene();
     score = 0;
     scoreElement.textContent = score;
