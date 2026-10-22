@@ -38,6 +38,8 @@ const maxObstacleSpeed = 500;
 // Временные интервалы заданы в миллисекундах.
 const millisecondsPerSecond = 1000;
 const maxFrameDelta = 50;
+const minObstacleDelay = 250;
+const maxObstacleDelay = 900;
 
 let bestScore = loadBestScore();
 let score = 0;
@@ -102,9 +104,11 @@ function updateJump(deltaTime) {
   if (characterPosition.y <= groundLevel && verticalVelocity <= 0) {
     resetJump();
     if (!preserveScoreMessage) {
-      messageElement.textContent = obstaclePassed
-        ? "Чебурашка на земле. Мандарин пройден — жди следующий."
-        : "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка.";
+      messageElement.textContent = obstacleElapsedTime < 0
+        ? "Чебурашка на земле. Жди следующий мандарин."
+        : obstaclePassed
+          ? "Чебурашка на земле. Мандарин пройден — жди следующий."
+          : "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка.";
     }
   }
 }
@@ -146,6 +150,10 @@ function updateScore() {
   }
 }
 
+function getObstacleDelay() {
+  return minObstacleDelay + Math.floor(Math.random() * (maxObstacleDelay - minObstacleDelay + 1));
+}
+
 function gameLoop(timestamp) {
   animationFrameId = null;
   if (gameState !== "playing") return;
@@ -153,14 +161,19 @@ function gameLoop(timestamp) {
   // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
   const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, maxFrameDelta);
   const obstacleTravelTime = (playfield.clientWidth - obstacleStartX) / currentObstacleSpeed * millisecondsPerSecond;
+  const wasWaiting = obstacleElapsedTime < 0;
   obstacleElapsedTime += deltaTime;
+  if (wasWaiting && obstacleElapsedTime >= 0) {
+    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
+  }
   if (obstacleElapsedTime >= obstacleTravelTime) {
-    obstacleElapsedTime %= obstacleTravelTime;
+    // Отрицательное время оставляет следующий мандарин за левым краем на время ожидания.
+    obstacleElapsedTime = obstacleElapsedTime % obstacleTravelTime - getObstacleDelay();
     // Новый темп включается только для следующего прохода мандарина.
     currentObstacleSpeed = Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed);
     obstaclePassed = false;
     preserveScoreMessage = false;
-    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
+    messageElement.textContent = "Жди следующий мандарин: промежуток между появлениями меняется.";
   }
   updateJump(deltaTime);
   previousFrameTime = timestamp;
@@ -260,11 +273,13 @@ function setGameState(state) {
     messageElement.textContent = "Нажми «Старт», затем прыгай кликом по полю или пробелом.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
-    messageElement.textContent = isJumping
-      ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
-      : obstaclePassed
-        ? "Мандарин пройден. Следующий скоро появится."
-        : "Клик по полю или пробел — прыжок. Перепрыгни мандарин.";
+    messageElement.textContent = obstacleElapsedTime < 0
+      ? "Жди следующий мандарин: промежуток между появлениями меняется."
+      : isJumping
+        ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
+        : obstaclePassed
+          ? "Мандарин пройден. Следующий скоро появится."
+          : "Клик по полю или пробел — прыжок. Перепрыгни мандарин.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
     messageElement.textContent = "Пауза: всё движение остановлено. Нажми «Продолжить», чтобы играть с того же места.";
