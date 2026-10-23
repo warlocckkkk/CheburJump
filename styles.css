@@ -226,6 +226,10 @@ h1 {
 .obstacles {
   position: absolute;
   z-index: 2;
+}
+
+.character,
+.obstacle {
   filter: drop-shadow(0 9px 7px rgba(95, 65, 45, 0.16));
 }
 
@@ -339,12 +343,12 @@ h1 {
 }
 
 .obstacles {
-  display: flex;
-  align-items: flex-end;
+  inset: 0;
+  pointer-events: none;
 }
 
 .obstacle {
-  position: relative;
+  position: absolute;
   display: block;
   width: clamp(2.8rem, 7vw, 4rem);
   aspect-ratio: 1.1;

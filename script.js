@@ -38,25 +38,25 @@ const maxObstacleSpeed = 500;
 // Временные интервалы заданы в миллисекундах.
 const millisecondsPerSecond = 1000;
 const maxFrameDelta = 50;
+// Перед случайной паузой оставляем время на прыжок и приземление.
+const obstacleRecoveryTime = 750;
 const minObstacleDelay = 250;
 const maxObstacleDelay = 900;
 
 let bestScore = loadBestScore();
 let score = 0;
-let obstaclePassed = false;
 let preserveScoreMessage = false;
 let lives = initialLives;
 let gameState = "ready";
 let isJumping = false;
 let animationFrameId = null;
 let previousFrameTime = null;
-let obstacleElapsedTime = 0;
-let currentObstacleSpeed = initialObstacleSpeed;
+let timeUntilNextObstacle = 0;
 let verticalVelocity = 0;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
-const obstaclePosition = { x: 0, y: obstacleGroundLevel };
+const activeObstacles = [];
 
 function loadBestScore() {
   try {
@@ -84,14 +84,17 @@ function updateBestScore() {
 function updatePositions() {
   const fieldWidth = playfield.clientWidth;
   characterPosition.x = fieldWidth * characterXRatio;
-  obstaclePosition.x = gameState === "ready"
-    ? fieldWidth * obstacleReadyXRatio - obstacles.offsetWidth
-    : obstacleStartX + obstacleElapsedTime / millisecondsPerSecond * currentObstacleSpeed;
 
   character.style.left = `${characterPosition.x}px`;
   character.style.bottom = `${characterPosition.y}px`;
-  obstacles.style.left = `${obstaclePosition.x}px`;
-  obstacles.style.bottom = `${obstaclePosition.y}px`;
+
+  for (const obstacle of activeObstacles) {
+    const x = gameState === "ready"
+      ? fieldWidth * obstacleReadyXRatio - obstacle.element.offsetWidth
+      : obstacle.x;
+    obstacle.element.style.left = `${x}px`;
+    obstacle.element.style.bottom = `${obstacleGroundLevel}px`;
+  }
 }
 
 function updateJump(deltaTime) {
@@ -104,28 +107,27 @@ function updateJump(deltaTime) {
   if (characterPosition.y <= groundLevel && verticalVelocity <= 0) {
     resetJump();
     if (!preserveScoreMessage) {
-      messageElement.textContent = obstacleElapsedTime < 0
-        ? "Чебурашка на земле. Жди следующий мандарин."
-        : obstaclePassed
-          ? "Чебурашка на земле. Мандарин пройден — жди следующий."
-          : "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка.";
+      messageElement.textContent = activeObstacles.some((obstacle) => !obstacle.passed)
+        ? "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка."
+        : "Чебурашка на земле. Жди следующий мандарин.";
     }
   }
 }
 
 function hasCollision() {
-  const obstacleBounds = obstacles.getBoundingClientRect();
-
   // Границы деталей учитывают CSS-масштаб и исключают пустое место вокруг спрайта.
-  for (const part of characterParts) {
-    const characterBounds = part.getBoundingClientRect();
-    if (
-      characterBounds.left <= obstacleBounds.right &&
-      characterBounds.right >= obstacleBounds.left &&
-      characterBounds.top <= obstacleBounds.bottom &&
-      characterBounds.bottom >= obstacleBounds.top
-    ) {
-      return true;
+  for (const obstacle of activeObstacles) {
+    const obstacleBounds = obstacle.element.getBoundingClientRect();
+    for (const part of characterParts) {
+      const characterBounds = part.getBoundingClientRect();
+      if (
+        characterBounds.left <= obstacleBounds.right &&
+        characterBounds.right >= obstacleBounds.left &&
+        characterBounds.top <= obstacleBounds.bottom &&
+        characterBounds.bottom >= obstacleBounds.top
+      ) {
+        return true;
+      }
     }
   }
 
@@ -133,25 +135,70 @@ function hasCollision() {
 }
 
 function updateScore() {
-  if (obstaclePassed) return;
-
-  const obstacleBounds = obstacles.getBoundingClientRect();
   const characterRight = Math.max(
     ...Array.from(characterParts, (part) => part.getBoundingClientRect().right)
   );
 
-  if (obstacleBounds.left > characterRight) {
-    obstaclePassed = true;
-    score += 1;
-    scoreElement.textContent = score;
-    updateBestScore();
-    preserveScoreMessage = true;
-    messageElement.textContent = `Мандарин позади! +1 очко. Текущий счёт: ${score}.`;
+  for (const obstacle of activeObstacles) {
+    if (obstacle.passed) continue;
+
+    const obstacleBounds = obstacle.element.getBoundingClientRect();
+    if (obstacleBounds.left > characterRight) {
+      obstacle.passed = true;
+      score += 1;
+      scoreElement.textContent = score;
+      updateBestScore();
+      preserveScoreMessage = true;
+      messageElement.textContent = `Мандарин позади! +1 очко. Текущий счёт: ${score}.`;
+    }
   }
 }
 
 function getObstacleDelay() {
-  return minObstacleDelay + Math.floor(Math.random() * (maxObstacleDelay - minObstacleDelay + 1));
+  const randomDelay = minObstacleDelay + Math.floor(Math.random() * (maxObstacleDelay - minObstacleDelay + 1));
+  return obstacleRecoveryTime + randomDelay;
+}
+
+function createObstacle() {
+  const element = document.createElement("span");
+  element.className = "obstacle";
+  element.setAttribute("aria-hidden", "true");
+  obstacles.append(element);
+
+  const obstacle = {
+    element,
+    x: obstacleStartX,
+    // Уже летящие мандарины не меняют скорость при появлении следующего.
+    speed: Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed),
+    passed: false,
+  };
+  activeObstacles.push(obstacle);
+  return obstacle;
+}
+
+function updateObstacles(deltaTime) {
+  for (const obstacle of activeObstacles) {
+    obstacle.x += deltaTime / millisecondsPerSecond * obstacle.speed;
+  }
+
+  timeUntilNextObstacle -= deltaTime;
+  if (timeUntilNextObstacle <= 0) {
+    const extraTime = -timeUntilNextObstacle;
+    const obstacle = createObstacle();
+    obstacle.x += extraTime / millisecondsPerSecond * obstacle.speed;
+    timeUntilNextObstacle = getObstacleDelay() - extraTime;
+    preserveScoreMessage = false;
+    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
+  }
+}
+
+function removeOffscreenObstacles() {
+  for (let index = activeObstacles.length - 1; index >= 0; index -= 1) {
+    if (activeObstacles[index].x > playfield.clientWidth) {
+      activeObstacles[index].element.remove();
+      activeObstacles.splice(index, 1);
+    }
+  }
 }
 
 function gameLoop(timestamp) {
@@ -160,21 +207,7 @@ function gameLoop(timestamp) {
 
   // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
   const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, maxFrameDelta);
-  const obstacleTravelTime = (playfield.clientWidth - obstacleStartX) / currentObstacleSpeed * millisecondsPerSecond;
-  const wasWaiting = obstacleElapsedTime < 0;
-  obstacleElapsedTime += deltaTime;
-  if (wasWaiting && obstacleElapsedTime >= 0) {
-    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
-  }
-  if (obstacleElapsedTime >= obstacleTravelTime) {
-    // Отрицательное время оставляет следующий мандарин за левым краем на время ожидания.
-    obstacleElapsedTime = obstacleElapsedTime % obstacleTravelTime - getObstacleDelay();
-    // Новый темп включается только для следующего прохода мандарина.
-    currentObstacleSpeed = Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed);
-    obstaclePassed = false;
-    preserveScoreMessage = false;
-    messageElement.textContent = "Жди следующий мандарин: промежуток между появлениями меняется.";
-  }
+  updateObstacles(deltaTime);
   updateJump(deltaTime);
   previousFrameTime = timestamp;
   updatePositions();
@@ -191,10 +224,11 @@ function gameLoop(timestamp) {
     resetScene();
     updatePositions();
     messageElement.textContent = lives === 1
-      ? "Столкновение! Осталась последняя жизнь. Мандарин начинает путь заново."
-      : `Столкновение! Осталось ${lives} жизни. Мандарин начинает путь заново.`;
+      ? "Столкновение! Осталась последняя жизнь. Мандарины начинают путь заново."
+      : `Столкновение! Осталось ${lives} жизни. Мандарины начинают путь заново.`;
   } else {
     updateScore();
+    removeOffscreenObstacles();
   }
 
   animationFrameId = requestAnimationFrame(gameLoop);
@@ -223,8 +257,10 @@ function resetJump() {
 
 function resetScene() {
   resetJump();
-  obstacleElapsedTime = 0;
-  obstaclePassed = false;
+  obstacles.replaceChildren();
+  activeObstacles.length = 0;
+  createObstacle();
+  timeUntilNextObstacle = getObstacleDelay();
   preserveScoreMessage = false;
 }
 
@@ -236,9 +272,8 @@ function setGameState(state) {
   const isGameOver = gameState === "finished" && lives === 0;
 
   if (gameState === "ready") {
-    currentObstacleSpeed = initialObstacleSpeed;
-    resetScene();
     score = 0;
+    resetScene();
     scoreElement.textContent = score;
     lives = initialLives;
     livesElement.textContent = lives;
@@ -273,13 +308,11 @@ function setGameState(state) {
     messageElement.textContent = "Нажми «Старт», затем прыгай кликом по полю или пробелом.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
-    messageElement.textContent = obstacleElapsedTime < 0
-      ? "Жди следующий мандарин: промежуток между появлениями меняется."
-      : isJumping
-        ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
-        : obstaclePassed
-          ? "Мандарин пройден. Следующий скоро появится."
-          : "Клик по полю или пробел — прыжок. Перепрыгни мандарин.";
+    messageElement.textContent = isJumping
+      ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
+      : activeObstacles.some((obstacle) => !obstacle.passed)
+        ? "Клик по полю или пробел — прыжок. Перепрыгни мандарины."
+        : "Жди следующий мандарин: промежуток между появлениями меняется.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
     messageElement.textContent = "Пауза: всё движение остановлено. Нажми «Продолжить», чтобы играть с того же места.";
