@@ -24,6 +24,8 @@ const initialLives = 3;
 // Горизонтальные коэффициенты — доли ширины поля, остальные позиции — пиксели.
 const groundLevel = 36;
 const obstacleGroundLevel = 38;
+// Приподнятый мандарин тоже можно перепрыгнуть обычным прыжком.
+const obstacleLevels = [obstacleGroundLevel, obstacleGroundLevel + 18];
 const obstacleStartX = -80;
 const characterXRatio = 0.2;
 const obstacleReadyXRatio = 0.81;
@@ -93,7 +95,7 @@ function updatePositions() {
       ? fieldWidth * obstacleReadyXRatio - obstacle.element.offsetWidth
       : obstacle.x;
     obstacle.element.style.left = `${x}px`;
-    obstacle.element.style.bottom = `${obstacleGroundLevel}px`;
+    obstacle.element.style.bottom = `${obstacle.y}px`;
   }
 }
 
@@ -159,7 +161,7 @@ function getObstacleDelay() {
   return obstacleRecoveryTime + randomDelay;
 }
 
-function createObstacle() {
+function createObstacle(y = obstacleGroundLevel) {
   const element = document.createElement("span");
   element.className = "obstacle";
   element.setAttribute("aria-hidden", "true");
@@ -168,6 +170,7 @@ function createObstacle() {
   const obstacle = {
     element,
     x: obstacleStartX,
+    y,
     // Уже летящие мандарины не меняют скорость при появлении следующего.
     speed: Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed),
     passed: false,
@@ -184,7 +187,8 @@ function updateObstacles(deltaTime) {
   timeUntilNextObstacle -= deltaTime;
   if (timeUntilNextObstacle <= 0) {
     const extraTime = -timeUntilNextObstacle;
-    const obstacle = createObstacle();
+    const levelIndex = Math.floor(Math.random() * obstacleLevels.length);
+    const obstacle = createObstacle(obstacleLevels[levelIndex]);
     obstacle.x += extraTime / millisecondsPerSecond * obstacle.speed;
     timeUntilNextObstacle = getObstacleDelay() - extraTime;
     preserveScoreMessage = false;
