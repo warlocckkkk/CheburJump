@@ -29,6 +29,9 @@ const obstacleLevels = [obstacleGroundLevel, obstacleGroundLevel + 18];
 const obstacleStartX = -80;
 const characterXRatio = 0.2;
 const obstacleReadyXRatio = 0.81;
+// Бонус находится выше стоящего персонажа, но в пределах обычного прыжка.
+const bonusLevel = 190;
+const bonusEveryObstacles = 3;
 
 // Скорости — пиксели в секунду, гравитация — пиксели в секунду за секунду.
 const jumpSpeed = 680;
@@ -55,6 +58,8 @@ let animationFrameId = null;
 let previousFrameTime = null;
 let timeUntilNextObstacle = 0;
 let verticalVelocity = 0;
+let obstaclesSpawned = 0;
+let activeBonus = null;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
@@ -97,6 +102,11 @@ function updatePositions() {
     obstacle.element.style.left = `${x}px`;
     obstacle.element.style.bottom = `${obstacle.y}px`;
   }
+
+  if (activeBonus) {
+    activeBonus.element.style.left = `${activeBonus.x}px`;
+    activeBonus.element.style.bottom = `${activeBonus.y}px`;
+  }
 }
 
 function updateJump(deltaTime) {
@@ -116,24 +126,26 @@ function updateJump(deltaTime) {
   }
 }
 
-function hasCollision() {
+function isTouchingCharacter(element) {
+  const objectBounds = element.getBoundingClientRect();
   // Границы деталей учитывают CSS-масштаб и исключают пустое место вокруг спрайта.
-  for (const obstacle of activeObstacles) {
-    const obstacleBounds = obstacle.element.getBoundingClientRect();
-    for (const part of characterParts) {
-      const characterBounds = part.getBoundingClientRect();
-      if (
-        characterBounds.left <= obstacleBounds.right &&
-        characterBounds.right >= obstacleBounds.left &&
-        characterBounds.top <= obstacleBounds.bottom &&
-        characterBounds.bottom >= obstacleBounds.top
-      ) {
-        return true;
-      }
+  for (const part of characterParts) {
+    const characterBounds = part.getBoundingClientRect();
+    if (
+      characterBounds.left <= objectBounds.right &&
+      characterBounds.right >= objectBounds.left &&
+      characterBounds.top <= objectBounds.bottom &&
+      characterBounds.bottom >= objectBounds.top
+    ) {
+      return true;
     }
   }
 
   return false;
+}
+
+function hasCollision() {
+  return activeObstacles.some((obstacle) => isTouchingCharacter(obstacle.element));
 }
 
 function updateScore() {
@@ -176,13 +188,47 @@ function createObstacle(y = obstacleGroundLevel) {
     passed: false,
   };
   activeObstacles.push(obstacle);
+  obstaclesSpawned += 1;
   return obstacle;
+}
+
+function clearBonus() {
+  if (activeBonus) activeBonus.element.remove();
+  activeBonus = null;
+}
+
+function createBonus(obstacle) {
+  clearBonus();
+  const element = document.createElement("span");
+  element.className = "obstacle obstacle--bonus";
+  element.textContent = "★";
+  element.setAttribute("aria-hidden", "true");
+  obstacles.append(element);
+  activeBonus = {
+    element,
+    x: obstacle.x + (obstacle.element.offsetWidth - element.offsetWidth) / 2,
+    y: bonusLevel,
+    speed: obstacle.speed,
+  };
+}
+
+function collectOrRemoveBonus() {
+  if (!activeBonus) return;
+
+  if (isTouchingCharacter(activeBonus.element)) {
+    clearBonus();
+    preserveScoreMessage = true;
+    messageElement.textContent = "Бонусная мандаринка собрана! Пока без дополнительных очков.";
+  } else if (activeBonus.x > playfield.clientWidth) {
+    clearBonus();
+  }
 }
 
 function updateObstacles(deltaTime) {
   for (const obstacle of activeObstacles) {
     obstacle.x += deltaTime / millisecondsPerSecond * obstacle.speed;
   }
+  if (activeBonus) activeBonus.x += deltaTime / millisecondsPerSecond * activeBonus.speed;
 
   timeUntilNextObstacle -= deltaTime;
   if (timeUntilNextObstacle <= 0) {
@@ -190,6 +236,7 @@ function updateObstacles(deltaTime) {
     const levelIndex = Math.floor(Math.random() * obstacleLevels.length);
     const obstacle = createObstacle(obstacleLevels[levelIndex]);
     obstacle.x += extraTime / millisecondsPerSecond * obstacle.speed;
+    if (obstaclesSpawned % bonusEveryObstacles === 0) createBonus(obstacle);
     timeUntilNextObstacle = getObstacleDelay() - extraTime;
     preserveScoreMessage = false;
     messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
@@ -232,6 +279,7 @@ function gameLoop(timestamp) {
       : `Столкновение! Осталось ${lives} жизни. Мандарины начинают путь заново.`;
   } else {
     updateScore();
+    collectOrRemoveBonus();
     removeOffscreenObstacles();
   }
 
@@ -261,8 +309,10 @@ function resetJump() {
 
 function resetScene() {
   resetJump();
+  clearBonus();
   obstacles.replaceChildren();
   activeObstacles.length = 0;
+  obstaclesSpawned = 0;
   createObstacle();
   timeUntilNextObstacle = getObstacleDelay();
   preserveScoreMessage = false;
