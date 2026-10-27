@@ -20,6 +20,7 @@ const restartButton = document.querySelector("#restart-button");
 
 const bestScoreKey = "cheburJump.bestScore";
 const initialLives = 3;
+const bonusPoints = 5;
 
 // Горизонтальные коэффициенты — доли ширины поля, остальные позиции — пиксели.
 const groundLevel = 36;
@@ -217,8 +218,11 @@ function collectOrRemoveBonus() {
 
   if (isTouchingCharacter(activeBonus.element)) {
     clearBonus();
+    score += bonusPoints;
+    scoreElement.textContent = score;
+    updateBestScore();
     preserveScoreMessage = true;
-    messageElement.textContent = "Бонусная мандаринка собрана! Пока без дополнительных очков.";
+    messageElement.textContent = `Бонусная мандаринка собрана! +${bonusPoints} очков. Текущий счёт: ${score}.`;
   } else if (activeBonus.x > playfield.clientWidth) {
     clearBonus();
   }
