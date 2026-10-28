@@ -49,6 +49,11 @@ const obstacleRecoveryTime = 750;
 const minObstacleDelay = 250;
 const maxObstacleDelay = 900;
 
+// Звук: длительность в секундах, частота в герцах, громкость от 0 до 1.
+const jumpSoundDuration = 0.12;
+const jumpSoundFrequency = 440;
+const jumpSoundVolume = 0.06;
+
 let bestScore = loadBestScore();
 let score = 0;
 let preserveScoreMessage = false;
@@ -61,6 +66,9 @@ let timeUntilNextObstacle = 0;
 let verticalVelocity = 0;
 let obstaclesSpawned = 0;
 let activeBonus = null;
+let jumpAudioContext = null;
+let activeJumpSound = null;
+let jumpSoundRequestId = 0;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
@@ -298,6 +306,7 @@ function startGameLoop() {
 }
 
 function stopGameLoop() {
+  stopJumpSound();
   if (animationFrameId !== null) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
@@ -306,6 +315,7 @@ function stopGameLoop() {
 }
 
 function resetJump() {
+  stopJumpSound();
   isJumping = false;
   verticalVelocity = 0;
   characterPosition.y = groundLevel;
@@ -412,6 +422,55 @@ function restartGame() {
 
 restartButton.addEventListener("click", restartGame);
 
+function stopJumpSound() {
+  // Отменяем также звук, который ещё ждёт разрешения браузера на запуск.
+  jumpSoundRequestId += 1;
+  if (activeJumpSound) {
+    activeJumpSound.stop();
+    activeJumpSound = null;
+  }
+}
+
+async function playJumpSound() {
+  const requestId = ++jumpSoundRequestId;
+
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    // Один контекст на игру; создаём его только после клика или нажатия клавиши.
+    if (!jumpAudioContext || jumpAudioContext.state === "closed") {
+      jumpAudioContext = new AudioContext();
+    }
+    if (jumpAudioContext.state !== "running") await jumpAudioContext.resume();
+    if (requestId !== jumpSoundRequestId || gameState !== "playing" || !isJumping) return;
+    if (jumpAudioContext.state !== "running") return;
+
+    const oscillator = jumpAudioContext.createOscillator();
+    const volume = jumpAudioContext.createGain();
+    const startTime = jumpAudioContext.currentTime;
+    const endTime = startTime + jumpSoundDuration;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(jumpSoundFrequency, startTime);
+    oscillator.frequency.exponentialRampToValueAtTime(jumpSoundFrequency * 2, endTime);
+    volume.gain.setValueAtTime(0, startTime);
+    volume.gain.linearRampToValueAtTime(jumpSoundVolume, startTime + 0.01);
+    volume.gain.exponentialRampToValueAtTime(0.001, endTime);
+    oscillator.connect(volume);
+    volume.connect(jumpAudioContext.destination);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      volume.disconnect();
+      if (activeJumpSound === oscillator) activeJumpSound = null;
+    };
+    oscillator.start(startTime);
+    oscillator.stop(endTime);
+    activeJumpSound = oscillator;
+  } catch {
+    // Если звук недоступен или заблокирован, прыжок и игра продолжаются без него.
+  }
+}
+
 function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
@@ -420,6 +479,7 @@ function registerTrainingJump() {
   verticalVelocity = jumpSpeed;
   messageElement.textContent =
     "Прыжок! Дождись приземления перед следующим прыжком.";
+  playJumpSound();
 }
 
 playfield.addEventListener("click", registerTrainingJump);
