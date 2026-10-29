@@ -260,6 +260,41 @@ h1 {
   content: "";
 }
 
+/* Лапки двигаются внутри границ тела и не меняют область столкновения. */
+.character__foot {
+  position: absolute;
+  bottom: 0;
+  width: 22px;
+  height: 14px;
+  border: 2px solid #4c2a1c;
+  border-radius: 55% 55% 40% 40%;
+  background: #623922;
+  animation: character-run 0.36s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.character__foot--left {
+  left: 40px;
+}
+
+.character__foot--right {
+  left: 70px;
+  animation-delay: -0.18s;
+}
+
+.character[data-motion="running"] .character__foot {
+  animation-play-state: running;
+}
+
+.character[data-motion="jumping"] .character__foot {
+  animation: none;
+}
+
+@keyframes character-run {
+  0%, 50%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-6px); }
+}
+
 .character__head {
   position: absolute;
   z-index: 1;

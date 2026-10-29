@@ -319,6 +319,13 @@ function resetJump() {
   isJumping = false;
   verticalVelocity = 0;
   characterPosition.y = groundLevel;
+  updateCharacterMotion();
+}
+
+function updateCharacterMotion() {
+  character.dataset.motion = isJumping
+    ? "jumping"
+    : gameState === "playing" ? "running" : gameState;
 }
 
 function resetScene() {
@@ -347,6 +354,7 @@ function setGameState(state) {
     livesElement.textContent = lives;
   }
 
+  updateCharacterMotion();
   if (isPlaying) startGameLoop();
   else {
     stopGameLoop();
@@ -477,6 +485,7 @@ function registerTrainingJump() {
   preserveScoreMessage = false;
   isJumping = true;
   verticalVelocity = jumpSpeed;
+  updateCharacterMotion();
   messageElement.textContent =
     "Прыжок! Дождись приземления перед следующим прыжком.";
   playJumpSound();
