@@ -186,6 +186,9 @@ function createObstacle(y = obstacleGroundLevel) {
   const element = document.createElement("span");
   element.className = "obstacle";
   element.setAttribute("aria-hidden", "true");
+  const sprite = document.createElement("span");
+  sprite.className = "obstacle__sprite";
+  element.append(sprite);
   obstacles.append(element);
 
   const obstacle = {
@@ -210,8 +213,11 @@ function createBonus(obstacle) {
   clearBonus();
   const element = document.createElement("span");
   element.className = "obstacle obstacle--bonus";
-  element.textContent = "★";
   element.setAttribute("aria-hidden", "true");
+  const sprite = document.createElement("span");
+  sprite.className = "obstacle__sprite";
+  sprite.textContent = "★";
+  element.append(sprite);
   obstacles.append(element);
   activeBonus = {
     element,
@@ -341,6 +347,7 @@ function resetScene() {
 
 function setGameState(state) {
   gameState = state;
+  obstacles.dataset.state = gameState;
   preserveScoreMessage = false;
   const isPlaying = gameState === "playing";
   const isPaused = gameState === "paused";
