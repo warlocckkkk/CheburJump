@@ -141,6 +141,10 @@ h1 {
   outline: none;
 }
 
+.playfield[data-background="mint"] {
+  background: linear-gradient(#b7ead6 0%, #e4f5dc 68%, #f8d59c 68%);
+}
+
 .playfield:focus-visible {
   box-shadow: inset 0 0 0 4px var(--purple);
 }

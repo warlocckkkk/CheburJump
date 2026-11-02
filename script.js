@@ -48,6 +48,8 @@ const maxFrameDelta = 50;
 const obstacleRecoveryTime = 750;
 const minObstacleDelay = 250;
 const maxObstacleDelay = 900;
+const backgroundChangeInterval = 15000;
+const backgroundThemes = ["sky", "mint"];
 
 // Звук: длительность в секундах, частота в герцах, громкость от 0 до 1.
 const jumpSoundDuration = 0.12;
@@ -66,6 +68,7 @@ let timeUntilNextObstacle = 0;
 let verticalVelocity = 0;
 let obstaclesSpawned = 0;
 let activeBonus = null;
+let backgroundElapsedTime = 0;
 let jumpAudioContext = null;
 let activeJumpSound = null;
 let jumpSoundRequestId = 0;
@@ -116,6 +119,11 @@ function updatePositions() {
     activeBonus.element.style.left = `${activeBonus.x}px`;
     activeBonus.element.style.bottom = `${activeBonus.y}px`;
   }
+}
+
+function updateBackground() {
+  const themeIndex = Math.floor(backgroundElapsedTime / backgroundChangeInterval) % backgroundThemes.length;
+  playfield.dataset.background = backgroundThemes[themeIndex];
 }
 
 function updateJump(deltaTime) {
@@ -276,6 +284,8 @@ function gameLoop(timestamp) {
 
   // После долгого перерыва не перескакиваем через препятствие и не выдаём бесплатное очко.
   const deltaTime = previousFrameTime === null ? 0 : Math.min(timestamp - previousFrameTime, maxFrameDelta);
+  backgroundElapsedTime += deltaTime;
+  updateBackground();
   updateObstacles(deltaTime);
   updateJump(deltaTime);
   previousFrameTime = timestamp;
@@ -354,6 +364,8 @@ function setGameState(state) {
   const isGameOver = gameState === "finished" && lives === 0;
 
   if (gameState === "ready") {
+    backgroundElapsedTime = 0;
+    updateBackground();
     score = 0;
     resetScene();
     scoreElement.textContent = score;
