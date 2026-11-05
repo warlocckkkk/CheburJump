@@ -49,7 +49,8 @@ const obstacleRecoveryTime = 750;
 const minObstacleDelay = 250;
 const maxObstacleDelay = 900;
 const backgroundChangeInterval = 15000;
-const backgroundThemes = ["sky", "mint"];
+// Две дневные палитры, затем вечер; полный цикл занимает 45 секунд игры.
+const backgroundThemes = ["sky", "mint", "evening"];
 
 // Звук: длительность в секундах, частота в герцах, громкость от 0 до 1.
 const jumpSoundDuration = 0.12;
