@@ -73,6 +73,7 @@ let backgroundElapsedTime = 0;
 let jumpAudioContext = null;
 let activeJumpSound = null;
 let jumpSoundRequestId = 0;
+let landingDust = null;
 
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
@@ -136,6 +137,7 @@ function updateJump(deltaTime) {
 
   if (characterPosition.y <= groundLevel && verticalVelocity <= 0) {
     resetJump();
+    showLandingDust();
     if (!preserveScoreMessage) {
       messageElement.textContent = activeObstacles.some((obstacle) => !obstacle.passed)
         ? "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка."
@@ -332,11 +334,30 @@ function stopGameLoop() {
 }
 
 function resetJump() {
+  clearLandingDust();
   stopJumpSound();
   isJumping = false;
   verticalVelocity = 0;
   characterPosition.y = groundLevel;
   updateCharacterMotion();
+}
+
+function clearLandingDust() {
+  if (landingDust) landingDust.remove();
+  landingDust = null;
+}
+
+function showLandingDust() {
+  clearLandingDust();
+  const dust = document.createElement("span");
+  dust.className = "landing-dust";
+  dust.setAttribute("aria-hidden", "true");
+  dust.addEventListener("animationend", () => {
+    dust.remove();
+    if (landingDust === dust) landingDust = null;
+  }, { once: true });
+  character.append(dust);
+  landingDust = dust;
 }
 
 function updateCharacterMotion() {
@@ -394,6 +415,7 @@ function setGameState(state) {
   resultScreen.hidden = gameState !== "finished";
 
   if (gameState === "finished") {
+    clearLandingDust();
     resultTitleElement.textContent = isGameOver ? "Жизни закончились" : "Тренировка завершена";
     resultScoreElement.textContent = score;
     restartButton.focus();
@@ -502,6 +524,7 @@ async function playJumpSound() {
 function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
+  clearLandingDust();
   preserveScoreMessage = false;
   isJumping = true;
   verticalVelocity = jumpSpeed;

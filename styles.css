@@ -269,6 +269,42 @@ h1 {
   height: 138px;
 }
 
+/* Пыль находится у лапок и не участвует в проверке столкновений. */
+.landing-dust {
+  position: absolute;
+  bottom: -3px;
+  left: 60px;
+  width: 12px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c69b74;
+  pointer-events: none;
+  animation: landing-dust 0.35s ease-out both;
+}
+
+.landing-dust::before,
+.landing-dust::after {
+  position: absolute;
+  bottom: -2px;
+  width: 10px;
+  height: 7px;
+  border-radius: inherit;
+  background: inherit;
+  content: "";
+}
+
+.landing-dust::before { left: -12px; }
+.landing-dust::after { right: -12px; }
+
+.playfield[aria-disabled="true"] .landing-dust {
+  animation-play-state: paused;
+}
+
+@keyframes landing-dust {
+  from { opacity: 0.65; transform: translateY(0) scale(0.5); }
+  to { opacity: 0; transform: translateY(-8px) scale(1.6); }
+}
+
 .character__body {
   position: absolute;
   bottom: 0;
