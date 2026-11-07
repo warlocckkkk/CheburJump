@@ -556,3 +556,7 @@ window.addEventListener("resize", updatePositions);
 bestScoreElement.textContent = bestScore;
 resultBestScoreElement.textContent = bestScore;
 setGameState("ready");
+document.querySelector("#game-card").hidden = false;
+// После показа карточки поле получает ширину для расчёта позиций.
+updatePositions();
+document.querySelector("#loading-screen").hidden = true;

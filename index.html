@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 33 из 70</p>
+        <p class="eyebrow">День 34 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Мандарины идут друг за другом через разные интервалы и постепенно ускоряются.
@@ -29,7 +29,12 @@
         </p>
       </header>
 
-      <section class="game-card" aria-labelledby="game-title">
+      <div class="game-card loading-screen" id="loading-screen">
+        <p role="status">Подготавливаем тренировочную площадку…</p>
+        <noscript>Для запуска игры включи JavaScript.</noscript>
+      </div>
+
+      <section class="game-card" id="game-card" aria-labelledby="game-title" hidden>
         <div class="game-card__header">
           <div>
             <p class="label">Тренировочная площадка</p>
@@ -95,7 +100,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.33</span>
+        <span>Версия 0.34</span>
       </footer>
     </main>
   </body>
