@@ -140,7 +140,7 @@ function updateJump(deltaTime) {
     showLandingDust();
     if (!preserveScoreMessage) {
       messageElement.textContent = activeObstacles.some((obstacle) => !obstacle.passed)
-        ? "Чебурашка на земле. Кликни по полю или нажми пробел для нового прыжка."
+        ? "Чебурашка на земле. Кликни по полю или нажми пробел либо ↑ для нового прыжка."
         : "Чебурашка на земле. Жди следующий мандарин.";
     }
   }
@@ -429,7 +429,7 @@ function setGameState(state) {
     messageElement.textContent = isJumping
       ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
       : activeObstacles.some((obstacle) => !obstacle.passed)
-        ? "Клик по полю или пробел — прыжок. Перепрыгни мандарины."
+        ? "Клик по полю, пробел или ↑ — прыжок. Перепрыгни мандарины."
         : "Жди следующий мандарин: промежуток между появлениями меняется.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
@@ -537,10 +537,12 @@ function registerTrainingJump() {
 playfield.addEventListener("click", registerTrainingJump);
 
 playfield.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    if (!event.repeat) registerTrainingJump();
-  }
+  if (gameState !== "playing") return;
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.key !== "Enter" && event.key !== " " && event.key !== "ArrowUp") return;
+
+  event.preventDefault();
+  if (!event.repeat) registerTrainingJump();
 });
 
 document.addEventListener("keydown", (event) => {
