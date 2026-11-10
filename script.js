@@ -13,6 +13,7 @@ const resultScoreElement = document.querySelector("#result-score");
 const resultBestScoreElement = document.querySelector("#result-best-score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
+const startHint = document.querySelector("#start-hint");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -404,6 +405,7 @@ function setGameState(state) {
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
+  startHint.hidden = gameState !== "ready";
   startButton.disabled = gameState !== "ready";
   pauseButton.disabled = !isPlaying && !isPaused;
   pauseButton.textContent = isPaused ? "Продолжить" : "Пауза";
@@ -423,7 +425,7 @@ function setGameState(state) {
 
   if (gameState === "ready") {
     statusElement.textContent = "Готов к старту";
-    messageElement.textContent = "Нажми «Старт», затем прыгай кликом по полю или пробелом.";
+    messageElement.textContent = "Нажми «Старт», чтобы начать тренировку.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
     messageElement.textContent = isJumping
