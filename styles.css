@@ -556,6 +556,16 @@ h1 {
   background: repeating-linear-gradient(-45deg, #f6c987 0 14px, #f2c17e 14px 28px);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .game-card__footer {
   color: var(--muted);
   font-size: 0.9rem;

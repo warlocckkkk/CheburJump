@@ -13,6 +13,7 @@ const resultScoreElement = document.querySelector("#result-score");
 const resultBestScoreElement = document.querySelector("#result-best-score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
+const announcement = document.querySelector("#game-announcement");
 const startHint = document.querySelector("#start-hint");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
@@ -249,6 +250,7 @@ function collectOrRemoveBonus() {
     updateBestScore();
     preserveScoreMessage = true;
     messageElement.textContent = `Бонусная мандаринка собрана! +${bonusPoints} очков. Текущий счёт: ${score}.`;
+    announcement.textContent = messageElement.textContent;
   } else if (activeBonus.x > playfield.clientWidth) {
     clearBonus();
   }
@@ -309,6 +311,7 @@ function gameLoop(timestamp) {
     messageElement.textContent = lives === 1
       ? "Столкновение! Осталась последняя жизнь. Мандарины начинают путь заново."
       : `Столкновение! Осталось ${lives} жизни. Мандарины начинают путь заново.`;
+    announcement.textContent = messageElement.textContent;
   } else {
     updateScore();
     collectOrRemoveBonus();
@@ -425,9 +428,11 @@ function setGameState(state) {
 
   if (gameState === "ready") {
     statusElement.textContent = "Готов к старту";
+    announcement.textContent = "";
     messageElement.textContent = "Нажми «Старт», чтобы начать тренировку.";
   } else if (isPlaying) {
     statusElement.textContent = "Игра идёт";
+    announcement.textContent = "Игра идёт.";
     messageElement.textContent = isJumping
       ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
       : activeObstacles.some((obstacle) => !obstacle.passed)
@@ -435,9 +440,11 @@ function setGameState(state) {
         : "Жди следующий мандарин: промежуток между появлениями меняется.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
+    announcement.textContent = "Пауза.";
     messageElement.textContent = "Пауза: всё движение остановлено. Нажми «Продолжить», чтобы играть с того же места.";
   } else {
     statusElement.textContent = isGameOver ? "Проигрыш" : "Завершено";
+    announcement.textContent = `${resultTitleElement.textContent}. Итоговый счёт: ${score}.`;
     messageElement.textContent = isGameOver
       ? "Жизни закончились. Нажми пробел или «Заново», чтобы начать новую тренировку."
       : "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";

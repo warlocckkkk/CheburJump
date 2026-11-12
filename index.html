@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 38 из 70</p>
+        <p class="eyebrow">День 39 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Мандарины идут друг за другом через разные интервалы и постепенно ускоряются.
@@ -57,7 +57,7 @@
           <strong>Как прыгать:</strong> кликни по полю или нажми <kbd>Пробел</kbd>, <kbd>↑</kbd> или <kbd>Enter</kbd>.
         </p>
 
-        <div class="playfield" id="playfield" role="button" tabindex="-1" aria-label="Тренировочное поле" aria-disabled="true">
+        <div class="playfield" id="playfield" role="button" tabindex="-1" aria-label="Тренировочное поле: прыжок" aria-describedby="start-hint" aria-disabled="true">
           <div class="cloud cloud--one" aria-hidden="true"></div>
           <div class="cloud cloud--two" aria-hidden="true"></div>
           <div class="character" id="character" aria-label="Чебурашка" role="img">
@@ -87,6 +87,8 @@
           <p class="result-screen__hint">Нажми пробел или «Заново», чтобы попробовать ещё раз.</p>
         </section>
 
+        <div class="visually-hidden" id="game-announcement" role="status" aria-atomic="true"></div>
+
         <div class="game-card__footer">
           <p id="message">Нажми «Старт», чтобы начать тренировку.</p>
           <span class="status" data-state="ready">
@@ -104,7 +106,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.38</span>
+        <span>Версия 0.39</span>
       </footer>
     </main>
   </body>
