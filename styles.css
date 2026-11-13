@@ -730,3 +730,10 @@ h1 {
     overflow-wrap: anywhere;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .character__foot,
+  .obstacle:not(.obstacle--bonus) > .obstacle__sprite {
+    animation: none;
+  }
+}

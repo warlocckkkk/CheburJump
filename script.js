@@ -20,6 +20,8 @@ const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
 const restartButton = document.querySelector("#restart-button");
 
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
 const bestScoreKey = "cheburJump.bestScore";
 const initialLives = 3;
 const bonusPoints = 5;
@@ -353,6 +355,8 @@ function clearLandingDust() {
 
 function showLandingDust() {
   clearLandingDust();
+  if (reducedMotion.matches) return;
+
   const dust = document.createElement("span");
   dust.className = "landing-dust";
   dust.setAttribute("aria-hidden", "true");
@@ -563,6 +567,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("resize", updatePositions);
+reducedMotion.addEventListener("change", (event) => {
+  if (event.matches) clearLandingDust();
+});
 
 bestScoreElement.textContent = bestScore;
 resultBestScoreElement.textContent = bestScore;
