@@ -156,6 +156,7 @@ h1 {
 
 .playfield {
   position: relative;
+  touch-action: manipulation;
   min-height: 340px;
   overflow: hidden;
   cursor: pointer;

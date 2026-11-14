@@ -144,7 +144,7 @@ function updateJump(deltaTime) {
     showLandingDust();
     if (!preserveScoreMessage) {
       messageElement.textContent = activeObstacles.some((obstacle) => !obstacle.passed)
-        ? "Чебурашка на земле. Кликни по полю или нажми пробел либо ↑ для нового прыжка."
+        ? "Чебурашка на земле. Коснись поля, кликни по нему или нажми пробел либо ↑ для нового прыжка."
         : "Чебурашка на земле. Жди следующий мандарин.";
     }
   }
@@ -440,7 +440,7 @@ function setGameState(state) {
     messageElement.textContent = isJumping
       ? "Прыжок продолжается. Дождись приземления перед следующим прыжком."
       : activeObstacles.some((obstacle) => !obstacle.passed)
-        ? "Клик по полю, пробел или ↑ — прыжок. Перепрыгни мандарины."
+        ? "Касание поля, клик, пробел или ↑ — прыжок. Перепрыгни мандарины."
         : "Жди следующий мандарин: промежуток между появлениями меняется.";
   } else if (isPaused) {
     statusElement.textContent = "Пауза";
