@@ -738,3 +738,18 @@ h1 {
     animation: none;
   }
 }
+
+.orientation-hint {
+  display: none;
+  margin: 0;
+  padding: 10px 16px;
+  color: var(--purple-dark);
+  background: var(--cream);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .orientation-hint {
+    display: block;
+  }
+}
