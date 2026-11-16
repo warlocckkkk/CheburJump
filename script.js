@@ -14,7 +14,8 @@ const resultBestScoreElement = document.querySelector("#result-best-score");
 const messageElement = document.querySelector("#message");
 const statusElement = document.querySelector("#game-status");
 const announcement = document.querySelector("#game-announcement");
-const startHint = document.querySelector("#start-hint");
+const mainMenu = document.querySelector("#main-menu");
+const gameCard = document.querySelector("#game-card");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -387,6 +388,8 @@ function resetScene() {
 
 function setGameState(state) {
   gameState = state;
+  mainMenu.hidden = state !== "ready";
+  gameCard.hidden = state === "ready";
   obstacles.dataset.state = gameState;
   preserveScoreMessage = false;
   const isPlaying = gameState === "playing";
@@ -412,7 +415,6 @@ function setGameState(state) {
 
   playfield.setAttribute("aria-disabled", String(!isPlaying));
   playfield.tabIndex = isPlaying ? 0 : -1;
-  startHint.hidden = gameState !== "ready";
   startButton.disabled = gameState !== "ready";
   pauseButton.disabled = !isPlaying && !isPaused;
   pauseButton.textContent = isPaused ? "Продолжить" : "Пауза";
@@ -574,7 +576,4 @@ reducedMotion.addEventListener("change", (event) => {
 bestScoreElement.textContent = bestScore;
 resultBestScoreElement.textContent = bestScore;
 setGameState("ready");
-document.querySelector("#game-card").hidden = false;
-// После показа карточки поле получает ширину для расчёта позиций.
-updatePositions();
 document.querySelector("#loading-screen").hidden = true;

@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 42 из 70</p>
+        <p class="eyebrow">День 43 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Мандарины идут друг за другом через разные интервалы и постепенно ускоряются.
@@ -33,6 +33,15 @@
         <p role="status">Подготавливаем тренировочную площадку…</p>
         <noscript>Для запуска игры включи JavaScript.</noscript>
       </div>
+
+      <section class="game-card main-menu" id="main-menu" aria-labelledby="menu-title" hidden>
+        <h2 id="menu-title">Главное меню</h2>
+        <p class="start-hint" id="start-hint">
+          <strong>Как прыгать:</strong> коснись поля, кликни по нему или нажми <kbd>Пробел</kbd>, <kbd>↑</kbd> или <kbd>Enter</kbd>.
+        </p>
+
+          <button class="control-button" id="start-button" type="button">Старт</button>
+      </section>
 
       <section class="game-card" id="game-card" aria-labelledby="game-title" hidden>
         <div class="game-card__header">
@@ -55,10 +64,6 @@
 
         <p class="orientation-hint">
           Поле узкое. Поверни телефон горизонтально, чтобы видеть больше игрового поля.
-        </p>
-
-        <p class="start-hint" id="start-hint">
-          <strong>Как прыгать:</strong> коснись поля, кликни по нему или нажми <kbd>Пробел</kbd>, <kbd>↑</kbd> или <kbd>Enter</kbd>.
         </p>
 
         <div class="playfield" id="playfield" role="button" tabindex="-1" aria-label="Тренировочное поле: прыжок" aria-describedby="start-hint" aria-disabled="true">
@@ -101,7 +106,6 @@
           </span>
         </div>
         <div class="game-controls">
-          <button class="control-button" id="start-button" type="button">Старт</button>
           <button class="control-button control-button--secondary" id="pause-button" type="button" aria-pressed="false" disabled>Пауза</button>
           <button class="control-button control-button--secondary" id="finish-button" type="button" disabled>Завершить</button>
           <button class="control-button control-button--secondary" id="restart-button" type="button" disabled>Заново</button>
@@ -110,7 +114,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.42</span>
+        <span>Версия 0.43</span>
       </footer>
     </main>
   </body>

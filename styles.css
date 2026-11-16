@@ -753,3 +753,12 @@ h1 {
     display: block;
   }
 }
+
+.main-menu {
+  padding: clamp(16px, 4vw, 30px);
+}
+
+.main-menu .start-hint {
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
