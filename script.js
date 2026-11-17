@@ -16,6 +16,7 @@ const statusElement = document.querySelector("#game-status");
 const announcement = document.querySelector("#game-announcement");
 const mainMenu = document.querySelector("#main-menu");
 const gameCard = document.querySelector("#game-card");
+const soundToggle = document.querySelector("#sound-toggle");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -457,6 +458,10 @@ function setGameState(state) {
   }
 }
 
+soundToggle.addEventListener("change", () => {
+  if (!soundToggle.checked) stopJumpSound();
+});
+
 startButton.addEventListener("click", () => {
   if (gameState !== "ready") return;
   setGameState("playing");
@@ -497,6 +502,8 @@ function stopJumpSound() {
 }
 
 async function playJumpSound() {
+  if (!soundToggle.checked) return;
+
   const requestId = ++jumpSoundRequestId;
 
   try {
