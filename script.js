@@ -17,6 +17,7 @@ const announcement = document.querySelector("#game-announcement");
 const mainMenu = document.querySelector("#main-menu");
 const gameCard = document.querySelector("#game-card");
 const soundToggle = document.querySelector("#sound-toggle");
+const difficultySelect = document.querySelector("#difficulty");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -46,6 +47,8 @@ const gravity = 2100;
 const initialObstacleSpeed = 425;
 const obstacleSpeedStep = 10;
 const maxObstacleSpeed = 500;
+const difficultySpeed = new Map([["easy", 0.85], ["normal", 1], ["hard", 1.1]]);
+let obstacleSpeedMultiplier = 1;
 
 // Временные интервалы заданы в миллисекундах.
 const millisecondsPerSecond = 1000;
@@ -213,7 +216,7 @@ function createObstacle(y = obstacleGroundLevel) {
     x: obstacleStartX,
     y,
     // Уже летящие мандарины не меняют скорость при появлении следующего.
-    speed: Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed),
+    speed: Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed) * obstacleSpeedMultiplier,
     passed: false,
   };
   activeObstacles.push(obstacle);
@@ -464,6 +467,8 @@ soundToggle.addEventListener("change", () => {
 
 startButton.addEventListener("click", () => {
   if (gameState !== "ready") return;
+  obstacleSpeedMultiplier = difficultySpeed.get(difficultySelect.value) ?? 1;
+  resetScene();
   setGameState("playing");
   playfield.focus();
 });
