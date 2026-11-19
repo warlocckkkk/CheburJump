@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --page-background: linear-gradient(145deg, #ffe2c8 0%, #fff7e8 48%, #eadcf4 100%);
   --ink: #332d39;
   --muted: #786f7b;
   --cream: #fff8ee;
@@ -20,7 +21,7 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--ink);
-  background: linear-gradient(145deg, #ffe2c8 0%, #fff7e8 48%, #eadcf4 100%);
+  background: var(--page-background);
 }
 
 .page-shell {
@@ -761,4 +762,15 @@ h1 {
 .main-menu .start-hint {
   margin-bottom: 16px;
   border-radius: 12px;
+}
+
+:root[data-color-theme="mint"] {
+  --page-background: linear-gradient(145deg, #d5efe5, #f2faf5 48%, #dcecf4);
+  --ink: #243b35;
+  --muted: #526b62;
+  --cream: #eff8f2;
+  --orange: #f4b56d;
+  --purple: #387562;
+  --purple-dark: #245345;
+  --yellow: #f3cf72;
 }

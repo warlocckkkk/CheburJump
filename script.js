@@ -17,6 +17,7 @@ const announcement = document.querySelector("#game-announcement");
 const mainMenu = document.querySelector("#main-menu");
 const gameCard = document.querySelector("#game-card");
 const soundToggle = document.querySelector("#sound-toggle");
+const colorThemeSelect = document.querySelector("#color-theme");
 const difficultySelect = document.querySelector("#difficulty");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
@@ -460,6 +461,10 @@ function setGameState(state) {
       : "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";
   }
 }
+
+colorThemeSelect.addEventListener("change", () => {
+  document.documentElement.dataset.colorTheme = colorThemeSelect.value === "mint" ? "mint" : "peach";
+});
 
 soundToggle.addEventListener("change", () => {
   if (!soundToggle.checked) stopJumpSound();
