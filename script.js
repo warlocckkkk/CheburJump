@@ -19,6 +19,9 @@ const gameCard = document.querySelector("#game-card");
 const soundToggle = document.querySelector("#sound-toggle");
 const colorThemeSelect = document.querySelector("#color-theme");
 const difficultySelect = document.querySelector("#difficulty");
+const playerNameInput = document.querySelector("#player-name");
+const resultPlayer = document.querySelector("#result-player");
+let playerName = "";
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -432,6 +435,7 @@ function setGameState(state) {
 
   if (gameState === "finished") {
     clearLandingDust();
+    resultPlayer.textContent = playerName;
     resultTitleElement.textContent = isGameOver ? "Жизни закончились" : "Тренировка завершена";
     resultScoreElement.textContent = score;
     restartButton.focus();
@@ -472,6 +476,9 @@ soundToggle.addEventListener("change", () => {
 
 startButton.addEventListener("click", () => {
   if (gameState !== "ready") return;
+  playerNameInput.value = playerNameInput.value.trim();
+  if (!playerNameInput.reportValidity()) return;
+  playerName = playerNameInput.value;
   obstacleSpeedMultiplier = difficultySpeed.get(difficultySelect.value) ?? 1;
   resetScene();
   setGameState("playing");

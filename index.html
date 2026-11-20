@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 46 из 70</p>
+        <p class="eyebrow">День 47 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Мандарины идут друг за другом через разные интервалы и постепенно ускоряются.
@@ -55,6 +55,10 @@
             <option value="peach" selected>Персиковая</option>
             <option value="mint">Мятная</option>
           </select>
+        </p>
+        <p>
+          <label for="player-name">Имя игрока</label>
+          <input id="player-name" type="text" maxlength="30" required autocomplete="nickname" />
         </p>
           <button class="control-button" id="start-button" type="button">Старт</button>
       </section>
@@ -106,6 +110,7 @@
 
         <section class="result-screen" id="result-screen" aria-labelledby="result-title" hidden>
           <h2 id="result-title">Тренировка завершена</h2>
+          <p>Игрок: <span id="result-player"></span></p>
           <p class="result-screen__label">Итоговый счёт</p>
           <p class="result-screen__score" id="result-score">0</p>
           <p class="result-screen__label">Рекорд: <span id="result-best-score">0</span></p>
@@ -130,7 +135,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.46</span>
+        <span>Версия 0.47</span>
       </footer>
     </main>
   </body>
