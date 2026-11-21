@@ -29,6 +29,10 @@ const restartButton = document.querySelector("#restart-button");
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+const leaderboard = document.querySelector("#leaderboard");
+const leaderboardMessage = document.querySelector("#leaderboard-message");
+const leaderboardKey = "cheburJump.leaderboard";
+
 const bestScoreKey = "cheburJump.bestScore";
 const initialLives = 3;
 const bonusPoints = 5;
@@ -91,6 +95,44 @@ let landingDust = null;
 // x — расстояние от левого края поля, y — высота над его нижним краем, в пикселях.
 const characterPosition = { x: 0, y: groundLevel };
 const activeObstacles = [];
+
+function loadLeaderboard() {
+  try {
+    const entries = JSON.parse(localStorage.getItem(leaderboardKey));
+    if (!Array.isArray(entries)) return [];
+    return entries.filter((entry) =>
+      entry && typeof entry.name === "string" && entry.name.trim().length > 0 &&
+      entry.name.length <= 30 && Number.isSafeInteger(entry.score) && entry.score >= 0
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveAndShowResult() {
+  const scores = new Map();
+  for (const entry of [...loadLeaderboard(), { name: playerName, score }]) {
+    scores.set(entry.name, Math.max(scores.get(entry.name) ?? 0, entry.score));
+  }
+  const entries = Array.from(scores, ([name, score]) => ({ name, score }))
+    .sort((a, b) => b.score - a.score);
+  leaderboardMessage.textContent = "";
+  try {
+    localStorage.setItem(leaderboardKey, JSON.stringify(entries));
+  } catch {
+    leaderboardMessage.textContent = "Хранилище недоступно. Этот результат показан только до закрытия страницы.";
+  }
+  leaderboard.replaceChildren();
+  for (const entry of entries) {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    const scoreCell = document.createElement("td");
+    nameCell.textContent = entry.name;
+    scoreCell.textContent = entry.score;
+    row.append(nameCell, scoreCell);
+    leaderboard.append(row);
+  }
+}
 
 function loadBestScore() {
   try {
@@ -436,6 +478,7 @@ function setGameState(state) {
   if (gameState === "finished") {
     clearLandingDust();
     resultPlayer.textContent = playerName;
+    saveAndShowResult();
     resultTitleElement.textContent = isGameOver ? "Жизни закончились" : "Тренировка завершена";
     resultScoreElement.textContent = score;
     restartButton.focus();

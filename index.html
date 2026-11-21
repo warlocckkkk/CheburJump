@@ -14,7 +14,7 @@
   <body>
     <main class="page-shell">
       <header class="intro">
-        <p class="eyebrow">День 47 из 70</p>
+        <p class="eyebrow">День 48 из 70</p>
         <h1>Мандариновый забег</h1>
         <p class="subtitle">
           Мандарины идут друг за другом через разные интервалы и постепенно ускоряются.
@@ -114,6 +114,12 @@
           <p class="result-screen__label">Итоговый счёт</p>
           <p class="result-screen__score" id="result-score">0</p>
           <p class="result-screen__label">Рекорд: <span id="result-best-score">0</span></p>
+          <table>
+            <caption>Лучшие результаты по именам в этом браузере</caption>
+            <thead><tr><th scope="col">Игрок</th><th scope="col">Очки</th></tr></thead>
+            <tbody id="leaderboard"></tbody>
+          </table>
+          <p id="leaderboard-message"></p>
           <p class="result-screen__hint">Нажми пробел или «Заново», чтобы попробовать ещё раз.</p>
         </section>
 
@@ -135,7 +141,7 @@
 
       <footer class="page-footer">
         <span>Учебный проект на HTML, CSS и JavaScript</span>
-        <span>Версия 0.47</span>
+        <span>Версия 0.48</span>
       </footer>
     </main>
   </body>
