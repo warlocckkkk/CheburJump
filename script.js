@@ -22,6 +22,8 @@ const difficultySelect = document.querySelector("#difficulty");
 const playerNameInput = document.querySelector("#player-name");
 const resultPlayer = document.querySelector("#result-player");
 let playerName = "";
+const resetProgressButton = document.querySelector("#reset-progress");
+const resetMessage = document.querySelector("#reset-message");
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const finishButton = document.querySelector("#finish-button");
@@ -508,6 +510,25 @@ function setGameState(state) {
       : "Тренировка завершена. Нажми пробел или «Заново», чтобы начать ещё раз.";
   }
 }
+
+resetProgressButton.addEventListener("click", () => {
+  if (gameState !== "ready") return;
+  if (!window.confirm("Удалить рекорд и все результаты по именам в этом браузере?")) return;
+
+  try {
+    localStorage.removeItem(bestScoreKey);
+    localStorage.removeItem(leaderboardKey);
+  } catch {
+    resetMessage.textContent = "Не удалось полностью удалить сохранённые результаты. Попробуй ещё раз.";
+    return;
+  }
+  bestScore = 0;
+  bestScoreElement.textContent = bestScore;
+  resultBestScoreElement.textContent = bestScore;
+  leaderboard.replaceChildren();
+  leaderboardMessage.textContent = "";
+  resetMessage.textContent = "Рекорд и таблица результатов сброшены.";
+});
 
 colorThemeSelect.addEventListener("change", () => {
   document.documentElement.dataset.colorTheme = colorThemeSelect.value === "mint" ? "mint" : "peach";
