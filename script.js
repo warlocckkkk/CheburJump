@@ -252,7 +252,7 @@ function getObstacleDelay() {
 
 function createObstacle(y = obstacleGroundLevel) {
   const element = document.createElement("span");
-  element.className = "obstacle";
+  element.className = obstaclesSpawned % 2 === 0 ? "obstacle" : "obstacle obstacle--apple";
   element.setAttribute("aria-hidden", "true");
   const sprite = document.createElement("span");
   sprite.className = "obstacle__sprite";

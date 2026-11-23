@@ -774,3 +774,10 @@ h1 {
   --purple-dark: #245345;
   --yellow: #f3cf72;
 }
+
+.obstacle--apple > .obstacle__sprite {
+  border-color: #47752d;
+  border-radius: 40% 40% 48% 48%;
+  background: radial-gradient(circle at 30% 25%, #e0ef94, #99c44b 45%, #659833);
+  box-shadow: inset -4px -4px 0 rgba(51, 92, 28, 0.2);
+}
