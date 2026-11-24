@@ -311,6 +311,10 @@ function collectOrRemoveBonus() {
   }
 }
 
+// Раз в 12 препятствий один фрукт получает более спокойную скорость.
+const slowdownEveryObstacles = 12;
+const slowdownMultiplier = 0.75;
+
 function updateObstacles(deltaTime) {
   for (const obstacle of activeObstacles) {
     obstacle.x += deltaTime / millisecondsPerSecond * obstacle.speed;
@@ -322,11 +326,16 @@ function updateObstacles(deltaTime) {
     const extraTime = -timeUntilNextObstacle;
     const levelIndex = Math.floor(Math.random() * obstacleLevels.length);
     const obstacle = createObstacle(obstacleLevels[levelIndex]);
+    const isSlowdown = obstaclesSpawned % slowdownEveryObstacles === 0;
+    if (isSlowdown) obstacle.speed *= slowdownMultiplier;
     obstacle.x += extraTime / millisecondsPerSecond * obstacle.speed;
     if (obstaclesSpawned % bonusEveryObstacles === 0) createBonus(obstacle);
     timeUntilNextObstacle = getObstacleDelay() - extraTime;
     preserveScoreMessage = false;
-    messageElement.textContent = "Новый мандарин приближается. Выбирай момент для прыжка.";
+    messageElement.textContent = isSlowdown
+      ? "Передышка! Этот фрукт движется на четверть медленнее."
+      : "Новый фрукт приближается. Выбирай момент для прыжка.";
+    if (isSlowdown) announcement.textContent = messageElement.textContent;
   }
 }
 
