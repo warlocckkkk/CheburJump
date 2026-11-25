@@ -4,6 +4,9 @@ const characterParts = character.querySelectorAll(
   ".character__body, .character__head, .character__ear"
 );
 const obstacles = document.querySelector("#obstacles");
+const achievement = document.querySelector("#achievement");
+const firstAchievementTarget = 5;
+let clearedObstacles = 0;
 const scoreElement = document.querySelector("#score");
 const bestScoreElement = document.querySelector("#best-score");
 const livesElement = document.querySelector("#lives");
@@ -236,6 +239,12 @@ function updateScore() {
     const obstacleBounds = obstacle.element.getBoundingClientRect();
     if (obstacleBounds.left > characterRight) {
       obstacle.passed = true;
+      clearedObstacles += 1;
+      if (clearedObstacles === firstAchievementTarget) {
+        achievement.hidden = false;
+        achievement.textContent = "Достижение «Первые пять» — пять препятствий пройдено за забег!";
+        announcement.textContent = achievement.textContent;
+      }
       score += 1;
       scoreElement.textContent = score;
       updateBestScore();
@@ -461,6 +470,8 @@ function setGameState(state) {
     backgroundElapsedTime = 0;
     updateBackground();
     score = 0;
+    clearedObstacles = 0;
+    achievement.hidden = true;
     resetScene();
     scoreElement.textContent = score;
     lives = initialLives;
