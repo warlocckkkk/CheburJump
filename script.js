@@ -1,3 +1,5 @@
+const beginnerHint = document.querySelector("#beginner-hint");
+let hasTriedJump = false;
 const playfield = document.querySelector("#playfield");
 const character = document.querySelector("#character");
 const characterParts = character.querySelectorAll(
@@ -464,6 +466,7 @@ function resetScene() {
 
 function setGameState(state) {
   gameState = state;
+  beginnerHint.hidden = state !== "playing" || hasTriedJump;
   mainMenu.hidden = state !== "ready";
   gameCard.hidden = state === "ready";
   obstacles.dataset.state = gameState;
@@ -655,6 +658,8 @@ async function playJumpSound() {
 function registerTrainingJump() {
   if (gameState !== "playing" || isJumping) return;
 
+  hasTriedJump = true;
+  beginnerHint.hidden = true;
   clearLandingDust();
   preserveScoreMessage = false;
   isJumping = true;
