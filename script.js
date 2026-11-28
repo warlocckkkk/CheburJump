@@ -229,7 +229,14 @@ function isTouchingCharacter(element) {
 }
 
 function hasCollision() {
-  return activeObstacles.some((obstacle) => isTouchingCharacter(obstacle.element));
+  const obstacle = activeObstacles.find((obstacle) =>
+    !obstacle.collisionHandled && isTouchingCharacter(obstacle.element)
+  );
+  if (!obstacle) return false;
+
+  // Помечаем контакт до обработки потери жизни.
+  obstacle.collisionHandled = true;
+  return true;
 }
 
 function updateScore() {
@@ -281,6 +288,7 @@ function createObstacle(y = obstacleGroundLevel) {
     // Уже летящие мандарины не меняют скорость при появлении следующего.
     speed: Math.min(initialObstacleSpeed + score * obstacleSpeedStep, maxObstacleSpeed) * obstacleSpeedMultiplier,
     passed: false,
+    collisionHandled: false,
   };
   activeObstacles.push(obstacle);
   obstaclesSpawned += 1;
